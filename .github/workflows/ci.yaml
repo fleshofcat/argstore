@@ -1,0 +1,69 @@
+name: CI/CD
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [ master ]
+
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v3.0.0
+
+  test:
+    runs-on: ubuntu-latest
+    name: Test (python 3.10)
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.1.0
+        with:
+          poetry-version: 1.1.14
+
+      - name: Load Cached Dependencies
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/
+          key: ${{ runner.os }}-python3.10-poetry-lock-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install
+
+      - name: Test with pytest
+        run: |
+          set -o pipefail  # To avoid the tee to rewrite the pytest exit code
+          poetry run pytest --cov=${{ github.event.repository.name }} --cov-report=term-missing:skip-covered --junitxml=pytest.xml tests | tee pytest-coverage.txt
+
+      - name: Pytest coverage comment
+        id: coverage_comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest.xml
+
+      - name: Update coverage badge on gist
+        if: github.ref == 'refs/heads/master'
+        uses: schneegans/dynamic-badges-action@v1.0.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: d01bb46aff24caedfa24f12d77fd3f42
+          filename: ${{ github.event.repository.name }}__${{ github.event.repository.default_branch }}.json
+          label: Coverage
+          message: ${{ steps.coverage_comment.outputs.coverage }}
+          color: ${{ steps.coverage_comment.outputs.color }}
+          namedLogo: python
