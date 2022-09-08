@@ -19,18 +19,14 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    name: Test (python ${{ matrix.python-version }})
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10"]
+    name: Test (python 3.10)
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.1.0
@@ -42,7 +38,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/
-          key: ${{ runner.os }}-python${{ matrix.python-version }}-poetry-lock-${{ hashFiles('poetry.lock') }}
+          key: ${{ runner.os }}-python3.10-poetry-lock-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
