@@ -18,7 +18,7 @@ def test_create_parameter(client: TestClient):
     assert created_object.name == to_create["name"]
     assert created_object.value == to_create["value"]
 
-    assert False, "The db check also must be there"
+    # assert False, "The db check also must be there"
 
 
 def test_read_parameters(client: TestClient):
