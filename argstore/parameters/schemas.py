@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictStr
 
 
 class CreateParameter(BaseModel):
     name: str
-    value: str | int
+    value: StrictStr | int
 
 
 class Parameter(CreateParameter):

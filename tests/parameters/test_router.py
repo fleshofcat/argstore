@@ -16,6 +16,7 @@ def test_create_parameter(client: TestClient):
 
     created_object = ClientSideParameter(**response.json())
     assert created_object.name == to_create["name"]
+    assert created_object.value == to_create["value"]
 
     assert False, "The db check also must be there"
 
