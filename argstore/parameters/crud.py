@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from argstore.parameters import models, schemas
 
 
-def create_parameter(db: Session, param: schemas.Parameter):
+def create_parameter(db: Session, param: schemas.CreateParameter):
     db_param = models.Parameter(
         name=param.name, type=type(param.value).__name__, value=str(param.value)
     )

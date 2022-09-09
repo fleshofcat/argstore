@@ -1,10 +1,13 @@
 from pydantic import BaseModel
 
 
-class Parameter(BaseModel):
-    id: int
+class CreateParameter(BaseModel):
     name: str
     value: str | int
+
+
+class Parameter(CreateParameter):
+    id: int
 
     class Config:
         orm_mode = True

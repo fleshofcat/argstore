@@ -27,7 +27,7 @@ def _convert_database_parameter_to_schema(param: models.Parameter) -> schemas.Pa
 
 
 @router.post("/parameters", response_model=schemas.Parameter, status_code=201)
-def create_parameter(param: schemas.Parameter, db: Session = Depends(get_db)):
+def create_parameter(param: schemas.CreateParameter, db: Session = Depends(get_db)):
     return _convert_database_parameter_to_schema(crud.create_parameter(db, param))
 
 
