@@ -31,6 +31,14 @@ def create_parameter(param: schemas.CreateParameter, db: Session = Depends(get_d
     return _convert_database_parameter_to_schema(crud.create_parameter(db, param))
 
 
+@router.put("/", response_model=schemas.Parameter)
+def update_parameter(param: schemas.Parameter, db: Session = Depends(get_db)):
+    updated_param = crud.update_parameter(db, param)
+    if updated_param is None:
+        raise HTTPException(status_code=204)
+    return _convert_database_parameter_to_schema(updated_param)
+
+
 @router.get("/", response_model=list[schemas.Parameter])
 def get_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return [

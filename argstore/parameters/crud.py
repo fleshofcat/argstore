@@ -25,3 +25,14 @@ def read_parameters(
     db: Session, skip: int = 0, limit: int = 100
 ) -> list[models.Parameter]:
     return db.query(models.Parameter).offset(skip).limit(limit).all()
+
+
+def update_parameter(db: Session, param: schemas.Parameter) -> models.Parameter | None:
+    if (
+        db.query(models.Parameter)
+        .filter(models.Parameter.id == param.id)
+        .update(map_param_from_schema_to_model_dict(param))
+        > 0
+    ):
+        return read_parameter(db, param.id)
+    return None
