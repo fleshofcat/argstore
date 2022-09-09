@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from .database import Base
+from argstore.database import Base
 
 
 class Parameter(Base):

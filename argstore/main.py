@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-from . import models
+from argstore.parameters.router import router
+
 from .database import engine
-from .router import router
+from .parameters import models
 
 models.Base.metadata.create_all(bind=engine)
 

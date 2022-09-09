@@ -1,7 +1,7 @@
 from pydantic import parse_obj_as
 from starlette.testclient import TestClient
 
-from argstore.schemas import Parameter
+from argstore.parameters.schemas import Parameter
 
 
 def test_create_parameter(client: TestClient):

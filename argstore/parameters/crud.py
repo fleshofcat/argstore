@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from argstore.parameters import models, schemas
 
 
 def create_parameter(db: Session, param: schemas.Parameter):
