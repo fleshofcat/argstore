@@ -11,3 +11,7 @@ def create_parameter(db: Session, param: schemas.Parameter):
     db.commit()
     db.refresh(db_param)
     return db_param
+
+
+def read_parameters(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Parameter).offset(skip).limit(limit).all()
