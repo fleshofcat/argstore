@@ -42,6 +42,14 @@ def test_read_not_existing_parameter(client: TestClient):
 
 
 def test_update_parameter(client: TestClient):
+    not_existing_param = {"id": 0, "name": "no_param", "value": 0}
+    assert (
+        client.put(
+            "/parameters", json=not_existing_param, allow_redirects=True
+        ).status_code
+        == 404
+    )
+
     created_param = client.post(
         "/parameters",
         json={"name": "param_to_update", "value": 11},
