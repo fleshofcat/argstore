@@ -37,3 +37,10 @@ def update_parameter(db: Session, param: schemas.Parameter) -> models.Parameter 
         db.commit()
         return read_parameter(db, param.id)
     return None
+
+
+def delete_parameter(db: Session, param_id: int) -> bool:
+    if db.query(models.Parameter).filter(models.Parameter.id == param_id).delete():
+        db.commit()
+        return True
+    return False

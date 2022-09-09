@@ -69,3 +69,14 @@ def test_update_parameter(client: TestClient):
 
     re_requested_updated_param = client.get(f"/parameters/{updated_param['id']}").json()
     assert re_requested_updated_param == updated_param
+
+
+def test_delete_parameter(client: TestClient):
+    param_to_del_id = client.post(
+        "/parameters",
+        json={"name": "param_to_del", "value": 22},
+        allow_redirects=True,
+    ).json()["id"]
+
+    assert client.delete(f"/parameters/{param_to_del_id}").status_code == 204
+    assert client.delete(f"/parameters/{param_to_del_id}").status_code == 404

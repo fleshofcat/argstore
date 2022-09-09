@@ -54,3 +54,9 @@ def get_parameter(param_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404)
 
     return _convert_database_parameter_to_schema(db_param)
+
+
+@router.delete("/{param_id}", status_code=204)
+def delete_parameter(param_id: int, db: Session = Depends(get_db)):
+    if not crud.delete_parameter(db, param_id):
+        raise HTTPException(status_code=404)
