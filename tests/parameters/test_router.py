@@ -11,7 +11,7 @@ class ClientSideParameter(Parameter):
 
 def test_create_parameter(client: TestClient):
     to_create = {"name": "param_name", "value": 20}
-    response = client.post("/parameters", json=to_create)
+    response = client.post("/parameters", json=to_create, allow_redirects=True)
     assert response.status_code == 201, response.reason
 
     created_object = ClientSideParameter(**response.json())

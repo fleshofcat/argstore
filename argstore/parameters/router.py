@@ -26,12 +26,12 @@ def _convert_database_parameter_to_schema(param: models.Parameter) -> schemas.Pa
     )
 
 
-@router.post("/parameters", response_model=schemas.Parameter, status_code=201)
+@router.post("/", response_model=schemas.Parameter, status_code=201)
 def create_parameter(param: schemas.CreateParameter, db: Session = Depends(get_db)):
     return _convert_database_parameter_to_schema(crud.create_parameter(db, param))
 
 
-@router.get("/parameters", response_model=list[schemas.Parameter])
+@router.get("/", response_model=list[schemas.Parameter])
 def get_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return [
         _convert_database_parameter_to_schema(p)
@@ -39,7 +39,7 @@ def get_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
     ]
 
 
-@router.get("/parameters/{param_id}", response_model=schemas.Parameter)
+@router.get("/{param_id}", response_model=schemas.Parameter)
 def get_parameter(param_id: int, db: Session = Depends(get_db)):
     db_param = crud.read_parameter(db, param_id)
     if db_param is None:
