@@ -3,10 +3,14 @@ from sqlalchemy.orm import Session
 from argstore.parameters import models, schemas
 
 
-def create_parameter(db: Session, param: schemas.CreateParameter):
-    db_param = models.Parameter(
+def map_param_from_schema_to_model_dict(param: schemas.CreateParameter) -> dict:
+    return dict(
         name=param.name, type=type(param.value).__name__, value=str(param.value)
     )
+
+
+def create_parameter(db: Session, param: schemas.CreateParameter):
+    db_param = models.Parameter(**map_param_from_schema_to_model_dict(param))
     db.add(db_param)
     db.commit()
     db.refresh(db_param)
