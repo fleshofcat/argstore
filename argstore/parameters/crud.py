@@ -34,5 +34,6 @@ def update_parameter(db: Session, param: schemas.Parameter) -> models.Parameter 
         .update(map_param_from_schema_to_model_dict(param))
         > 0
     ):
+        db.commit()
         return read_parameter(db, param.id)
     return None

@@ -66,3 +66,6 @@ def test_update_parameter(client: TestClient):
     updated_param = update_response.json()
     assert updated_param["value"] == 0
     assert updated_param["id"] == created_param["id"]
+
+    re_requested_updated_param = client.get(f"/parameters/{updated_param['id']}").json()
+    assert re_requested_updated_param == updated_param
