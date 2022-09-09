@@ -22,5 +22,19 @@ def test_create_parameter(client: TestClient):
 
 def test_read_parameters(client: TestClient):
     response = client.get("/parameters")
-    assert response.status_code == 200
+    assert response.status_code == 200, response.reason
     assert parse_obj_as(list[ClientSideParameter], response.json())
+
+
+def test_read_parameter(client: TestClient):
+    assert (existed_id := client.get("/parameters").json()[0]["id"])
+    response = client.get(f"/parameters/{existed_id}")
+    assert response.status_code == 200, response.reason
+    assert ClientSideParameter(**response.json())
+
+
+def test_read_not_existing_parameter(client: TestClient):
+    client.delete(f"/parameters/{0}")
+    response = client.get(f"/parameters/{0}")
+    assert response.status_code == 404
+    assert "detail" in response.json()

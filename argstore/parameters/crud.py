@@ -13,5 +13,9 @@ def create_parameter(db: Session, param: schemas.Parameter):
     return db_param
 
 
+def read_parameter(db: Session, param_id: int):
+    return db.query(models.Parameter).filter(models.Parameter.id == param_id).first()
+
+
 def read_parameters(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Parameter).offset(skip).limit(limit).all()
