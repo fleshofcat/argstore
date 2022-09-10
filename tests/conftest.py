@@ -10,6 +10,15 @@ from argstore.main import app
 from argstore.parameters.router import get_db
 
 
+# noinspection PyUnusedLocal
+def pytest_make_parametrize_id(config, val):
+
+    if callable(val) and hasattr(val, "__name__"):
+        return repr(val.__name__)
+
+    return repr(val)
+
+
 @pytest.fixture(scope="session")
 def use_test_db():
     db_filename = "./test.db"
