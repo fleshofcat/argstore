@@ -1,12 +1,7 @@
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-from argstore.database import Base, engine
 from argstore.parameters.router import router
-
-# TODO Remove it
-Base.metadata.create_all(bind=engine)  # type: ignore
-
 
 app = FastAPI()
 
