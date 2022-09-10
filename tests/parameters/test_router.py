@@ -35,6 +35,29 @@ def test_create_parameter(client: TestClient):
     assert created_param == re_requested_param
 
 
+invalid_params = [
+    {},
+    [],
+    [1, "2"],
+    None,
+    {"invalid": "structure"},
+    {"name": "n"},
+    {"value": 0},
+    {"name": "", "value": 0},
+    {"name": 3, "value": 0},
+    {"name": "name", "value": 0.1},
+    {"name": "name", "value": None},
+]
+
+
+@pytest.mark.parametrize("payload", invalid_params)
+def test_create_parameter_with_invalid_payload(client: TestClient, payload: dict):
+    response = client.post("/parameters", json=payload, allow_redirects=True)
+    assert response.status_code == 422, response.reason
+    assert response.reason == "Unprocessable Entity"
+    assert "detail" in response.json()
+
+
 def test_read_parameters(client: TestClient, make_sure_there_are_some_params):
     response = client.get("/parameters")
     assert response.status_code == 200, response.reason
@@ -77,6 +100,26 @@ def test_update_not_existed_parameter(client: TestClient, not_existed_param_id):
     )
     assert response.status_code == 404, response.reason
     assert "detail" in response.json()
+
+
+@pytest.mark.parametrize("payload", [p for p in invalid_params if type(p) is dict])
+def test_update_parameter_with_invalid_payload(
+    client: TestClient, existed_param: ClientSideParameter, payload: dict
+):
+    payload["id"] = existed_param.id
+    update_response = client.put("/parameters", json=payload, allow_redirects=True)
+    assert update_response.status_code == 422
+    assert "detail" in update_response.json()
+
+
+def test_update_parameter_without_id(
+    client: TestClient, existed_param: ClientSideParameter
+):
+    update_response = client.put(
+        "/parameters", json={"name": "name", "value": 1}, allow_redirects=True
+    )
+    assert update_response.status_code == 422
+    assert "detail" in update_response.json()
 
 
 def test_delete_parameter(client: TestClient, existed_param):

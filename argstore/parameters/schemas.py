@@ -1,9 +1,15 @@
-from pydantic import BaseModel, StrictStr
+from pydantic import BaseModel, StrictInt, StrictStr, validator
 
 
 class CreateParameter(BaseModel):
-    name: str
-    value: StrictStr | int
+    name: StrictStr
+    value: StrictStr | StrictInt
+
+    @validator("name")
+    def name_must_be_not_empty(cls, name):
+        if name == "":
+            raise ValueError("name must be not empty")
+        return name
 
 
 class Parameter(CreateParameter):
