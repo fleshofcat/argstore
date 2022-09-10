@@ -34,6 +34,7 @@ def test_read_parameter(client: TestClient, existed_param):
 def test_read_not_existing_parameter(client: TestClient, not_existed_param_id: int):
     response = client.get(f"/parameters/{not_existed_param_id}")
     assert response.status_code == 404, response.reason
+    assert "detail" in response.json()
 
 
 def test_update_parameter(client: TestClient, existed_param: ClientSideParameter):
@@ -58,8 +59,11 @@ def test_update_not_existed_parameter(client: TestClient, not_existed_param_id):
         allow_redirects=True,
     )
     assert response.status_code == 404, response.reason
+    assert "detail" in response.json()
 
 
 def test_delete_parameter(client: TestClient, existed_param):
     assert client.delete(f"/parameters/{existed_param.id}").status_code == 204
     assert client.delete(f"/parameters/{existed_param.id}").status_code == 404
+
+    assert "detail" in client.delete(f"/parameters/{existed_param.id}").json()
