@@ -1,82 +1,65 @@
 from pydantic import parse_obj_as
 from starlette.testclient import TestClient
 
-from argstore.parameters.schemas import Parameter
-
-
-class ClientSideParameter(Parameter):
-    class Config:
-        orm_mode = False
+from tests.parameters.conftest import ClientSideParameter
 
 
 def test_create_parameter(client: TestClient):
-    to_create = {"name": "param_name", "value": 20}
-    response = client.post("/parameters", json=to_create, allow_redirects=True)
+    response = client.post(
+        "/parameters", json={"name": "param_name", "value": 20}, allow_redirects=True
+    )
     assert response.status_code == 201, response.reason
 
-    created_object = ClientSideParameter(**response.json())
-    assert created_object.name == to_create["name"]
-    assert created_object.value == to_create["value"]
+    created_param = response.json()
+    assert created_param["name"] == "param_name"
+    assert created_param["value"] == 20
 
-    # assert False, "The db check also must be there"
+    re_requested_param = client.get(f"/parameters/{created_param['id']}").json()
+    assert created_param == re_requested_param
 
 
-def test_read_parameters(client: TestClient):
+def test_read_parameters(client: TestClient, make_sure_there_are_some_params):
     response = client.get("/parameters")
     assert response.status_code == 200, response.reason
+    assert response.json()
     assert parse_obj_as(list[ClientSideParameter], response.json())
 
 
-def test_read_parameter(client: TestClient):
-    assert (existed_id := client.get("/parameters").json()[0]["id"])
-    response = client.get(f"/parameters/{existed_id}")
+def test_read_parameter(client: TestClient, existed_param):
+    response = client.get(f"/parameters/{existed_param.id}")
     assert response.status_code == 200, response.reason
     assert ClientSideParameter(**response.json())
 
 
-def test_read_not_existing_parameter(client: TestClient):
-    client.delete(f"/parameters/{0}")
-    response = client.get(f"/parameters/{0}")
-    assert response.status_code == 404
-    assert "detail" in response.json()
+def test_read_not_existing_parameter(client: TestClient, not_existed_param_id: int):
+    response = client.get(f"/parameters/{not_existed_param_id}")
+    assert response.status_code == 404, response.reason
 
 
-def test_update_parameter(client: TestClient):
-    not_existing_param = {"id": 0, "name": "no_param", "value": 0}
-    assert (
-        client.put(
-            "/parameters", json=not_existing_param, allow_redirects=True
-        ).status_code
-        == 404
-    )
-
-    created_param = client.post(
-        "/parameters",
-        json={"name": "param_to_update", "value": 11},
-        allow_redirects=True,
-    ).json()
-
-    assert created_param["id"]
-
+def test_update_parameter(client: TestClient, existed_param: ClientSideParameter):
+    update_payload = existed_param.copy(update={"value": "updated_value"}).dict()
     update_response = client.put(
-        "/parameters", json=created_param | {"value": 0}, allow_redirects=True
+        "/parameters", json=update_payload, allow_redirects=True
     )
-    assert update_response.status_code == 200
+    assert update_response.status_code == 200, update_response.reason
 
     updated_param = update_response.json()
-    assert updated_param["value"] == 0
-    assert updated_param["id"] == created_param["id"]
+    assert updated_param["value"] == "updated_value"
+    assert updated_param == update_payload
 
     re_requested_updated_param = client.get(f"/parameters/{updated_param['id']}").json()
     assert re_requested_updated_param == updated_param
 
 
-def test_delete_parameter(client: TestClient):
-    param_to_del_id = client.post(
+def test_update_not_existed_parameter(client: TestClient, not_existed_param_id):
+    response = client.put(
         "/parameters",
-        json={"name": "param_to_del", "value": 22},
+        json={"id": not_existed_param_id, "name": "no_param", "value": 0},
         allow_redirects=True,
-    ).json()["id"]
+    )
+    assert response.status_code == 404, response.reason
 
-    assert client.delete(f"/parameters/{param_to_del_id}").status_code == 204
-    assert client.delete(f"/parameters/{param_to_del_id}").status_code == 404
+
+def test_delete_parameter(client: TestClient, existed_param):
+    assert client.delete(f"/parameters/{existed_param.id}").status_code == 204
+    assert client.delete(f"/parameters/{existed_param.id}").status_code == 404
