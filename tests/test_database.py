@@ -1,13 +1,18 @@
 from unittest.mock import patch
 
 import pytest
+from pytest_mock import MockerFixture
 from sqlalchemy.orm import Session
 
-from argstore.database import get_db
+from argstore import database
 
 
-def test_get_db():
-    session_generator = get_db()
+def test_get_db(mocker: MockerFixture):
+
+    mocker.patch.object(database, "_engine")
+    mocker.patch.object(database, "_SessionFabric")
+
+    session_generator = database.get_db()
     session: Session = next(session_generator)
 
     with patch.object(session, "close") as close_mock:
