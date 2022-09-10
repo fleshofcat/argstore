@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from argstore.database import SessionLocal
-from argstore.parameters import crud, models, schemas
+from argstore.parameters import crud, schemas
+from argstore.parameters.crud import _cast_database_parameter_to_schema
 
 router = APIRouter()
 
@@ -15,20 +16,9 @@ def get_db():
         db.close()
 
 
-_possible_types = {"str": str, "int": int}
-
-
-def _convert_database_parameter_to_schema(param: models.Parameter) -> schemas.Parameter:
-    return schemas.Parameter(
-        id=param.id,
-        name=param.name,
-        value=_possible_types[param.type](param.value),
-    )
-
-
 @router.post("/", response_model=schemas.Parameter, status_code=201)
 def create_parameter(param: schemas.CreateParameter, db: Session = Depends(get_db)):
-    return _convert_database_parameter_to_schema(crud.create_parameter(db, param))
+    return _cast_database_parameter_to_schema(crud.create_parameter(db, param))
 
 
 @router.put("/", response_model=schemas.Parameter)
@@ -36,13 +26,13 @@ def update_parameter(param: schemas.Parameter, db: Session = Depends(get_db)):
     updated_param = crud.update_parameter(db, param)
     if updated_param is None:
         raise HTTPException(status_code=404)
-    return _convert_database_parameter_to_schema(updated_param)
+    return _cast_database_parameter_to_schema(updated_param)
 
 
 @router.get("/", response_model=list[schemas.Parameter])
 def get_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return [
-        _convert_database_parameter_to_schema(p)
+        _cast_database_parameter_to_schema(p)
         for p in crud.read_parameters(db, skip, limit)
     ]
 
@@ -53,7 +43,7 @@ def get_parameter(param_id: int, db: Session = Depends(get_db)):
     if db_param is None:
         raise HTTPException(status_code=404)
 
-    return _convert_database_parameter_to_schema(db_param)
+    return _cast_database_parameter_to_schema(db_param)
 
 
 @router.delete("/{param_id}", status_code=204)

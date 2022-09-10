@@ -2,6 +2,16 @@ from sqlalchemy.orm import Session
 
 from argstore.parameters import models, schemas
 
+_possible_types = {"str": str, "int": int}
+
+
+def _cast_database_parameter_to_schema(param: models.Parameter) -> schemas.Parameter:
+    return schemas.Parameter(
+        id=param.id,
+        name=param.name,
+        value=_possible_types[param.type](param.value),
+    )
+
 
 def map_param_from_schema_to_model_dict(param: schemas.CreateParameter) -> dict:
     return dict(
