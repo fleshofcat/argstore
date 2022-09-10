@@ -15,10 +15,13 @@ repos:
       - id: flake8
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.942
+    rev: v0.971
     hooks:
       - id: mypy
-        additional_dependencies: [pydantic==1.8.2]
+        additional_dependencies:
+          - pydantic==1.8.2
+          - typing-extensions
+          - "sqlalchemy[mypy]==1.4.29"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.3.0
@@ -34,4 +37,4 @@ repos:
         language: system
         always_run: false
         pass_filenames: false
-        stages: [ push ]
+        stages: [push]
