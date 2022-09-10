@@ -1,7 +1,24 @@
+from unittest.mock import patch
+
+import pytest
 from pydantic import parse_obj_as
+from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from argstore.parameters.router import get_db
 from tests.parameters.conftest import ClientSideParameter
+
+
+def test_get_db():
+    session_generator = get_db()
+    session: Session = next(session_generator)
+
+    with patch.object(session, "close") as close_mock:
+        with pytest.raises(StopIteration):
+            next(session_generator)
+
+        assert close_mock.called
+    session.close()
 
 
 def test_create_parameter(client: TestClient):
