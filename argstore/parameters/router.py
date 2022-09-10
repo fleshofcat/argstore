@@ -1,19 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from argstore.database import SessionLocal
+from argstore.database import get_db
 from argstore.parameters import crud, schemas
 from argstore.parameters.crud import _cast_database_parameter_to_schema
 
 router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=schemas.Parameter, status_code=201)

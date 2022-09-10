@@ -5,9 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.testclient import TestClient
 
-from argstore.database import Base
+from argstore.database import Base, get_db
 from argstore.main import app
-from argstore.parameters.router import get_db
 
 
 # noinspection PyUnusedLocal
