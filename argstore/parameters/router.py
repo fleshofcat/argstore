@@ -30,7 +30,7 @@ def update_parameter(param: schemas.Parameter, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[schemas.Parameter])
-def get_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return [
         _cast_database_parameter_to_schema(p)
         for p in crud.read_parameters(db, skip, limit)
@@ -38,7 +38,7 @@ def get_parameters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
 
 
 @router.get("/{param_id}", response_model=schemas.Parameter)
-def get_parameter(param_id: int, db: Session = Depends(get_db)):
+def read_parameter(param_id: int, db: Session = Depends(get_db)):
     db_param = crud.read_parameter(db, param_id)
     if db_param is None:
         raise HTTPException(status_code=404)
