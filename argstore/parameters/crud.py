@@ -9,7 +9,7 @@ def _cast_database_parameter_to_schema(param: models.Parameter) -> schemas.Param
     return schemas.Parameter(
         id=param.id,
         name=param.name,
-        value=_possible_types[param.type](param.value),
+        value=_possible_types[str(param.type)](param.value),
     )
 
 
