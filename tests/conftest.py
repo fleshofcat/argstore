@@ -2,9 +2,11 @@ import asyncio
 import os
 
 import pytest
+from sqlalchemy import create_engine
 from starlette.testclient import TestClient
 
-from argstore.database import Base, create_db_engine
+from argstore import database
+from argstore.database import Base
 from argstore.main import app
 
 
@@ -24,8 +26,17 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def use_test_db():
+
     db_filename = "./test.db"
-    engine = create_db_engine(sqlalchemy_database_url=f"sqlite:///{db_filename}")
+    database.set_sqlalchemy_database_url(f"sqlite+aiosqlite:///{db_filename}")
+
+    # Tests using the client fixture is about how users work with the API.
+    # Which means that no matter what asynchrony is when processing requests,
+    # users should be abstracted from this
+    # and should be able to work with the service synchronously
+    engine = create_engine(
+        f"sqlite:///{db_filename}", connect_args={"check_same_thread": False}
+    )
 
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)

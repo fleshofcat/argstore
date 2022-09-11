@@ -1,4 +1,9 @@
-from sqlalchemy.orm import Session
+from typing import cast
+
+from sqlalchemy import update
+from sqlalchemy.engine import BaseCursorResult
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from argstore.parameters import models, schemas
 
@@ -19,38 +24,60 @@ def map_param_from_schema_to_model_dict(param: schemas.CreateParameter) -> dict:
     )
 
 
-def create_parameter(db: Session, param: schemas.CreateParameter) -> models.Parameter:
+async def create_parameter(
+    db: AsyncSession, param: schemas.CreateParameter
+) -> models.Parameter:
     db_param = models.Parameter(**map_param_from_schema_to_model_dict(param))
     db.add(db_param)
-    db.commit()
-    db.refresh(db_param)
+    await db.commit()
+    await db.refresh(db_param)
     return db_param
 
 
-def read_parameter(db: Session, param_id: int) -> models.Parameter | None:
-    return db.query(models.Parameter).filter(models.Parameter.id == param_id).first()
+async def read_parameter(db: AsyncSession, param_id: int) -> models.Parameter | None:
+    return (
+        (
+            await db.execute(
+                select(models.Parameter).where(models.Parameter.id == param_id)
+            )
+        )
+        .scalars()
+        .first()
+    )
 
 
-def read_parameters(
-    db: Session, skip: int = 0, limit: int = 100
+async def read_parameters(
+    db: AsyncSession, skip: int = 0, limit: int = 100
 ) -> list[models.Parameter]:
-    return db.query(models.Parameter).offset(skip).limit(limit).all()
+    return (
+        (await db.execute(select(models.Parameter).offset(skip).limit(limit)))
+        .scalars()
+        .all()
+    )
 
 
-def update_parameter(db: Session, param: schemas.Parameter) -> models.Parameter | None:
-    if (
-        db.query(models.Parameter)
-        .filter(models.Parameter.id == param.id)
-        .update(map_param_from_schema_to_model_dict(param))
-        > 0
-    ):
-        db.commit()
-        return read_parameter(db, param.id)
+async def update_parameter(
+    db: AsyncSession, param: schemas.Parameter
+) -> models.Parameter | None:
+    # param_to_update = await read_parameter(db, param.id)
+
+    query = (
+        update(models.Parameter)
+        .where(models.Parameter.id == param.id)
+        .values(map_param_from_schema_to_model_dict(param))
+        .execution_options(synchronize_session="fetch")
+    )
+
+    update_result = cast(BaseCursorResult, await db.execute(query))
+    if cast(int, update_result.rowcount) > 0:
+        await db.commit()
+        return await read_parameter(db, param.id)
     return None
 
 
-def delete_parameter(db: Session, param_id: int) -> bool:
-    if db.query(models.Parameter).filter(models.Parameter.id == param_id).delete():
-        db.commit()
+async def delete_parameter(db: AsyncSession, param_id: int) -> bool:
+    if to_del := await read_parameter(db, param_id):
+        await db.delete(to_del)
+        await db.commit()
         return True
     return False

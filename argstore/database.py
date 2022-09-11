@@ -1,44 +1,44 @@
-from typing import Generator
-
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from argstore.settings import Settings
 
 Base = declarative_base()
+
+_db_url = ""
+
+
+def set_sqlalchemy_database_url(url: str):
+    global _db_url
+    _db_url = url
 
 
 _SessionFabric = None
 _engine = None
 
 
-def create_db_engine(sqlalchemy_database_url: str = "") -> Engine:
+def create_db_engine() -> AsyncEngine:
     global _engine
     if not _engine:
-        if not sqlalchemy_database_url:
-            sqlalchemy_database_url = Settings().sqlalchemy_database_url
+        if not _db_url:
+            set_sqlalchemy_database_url(Settings().sqlalchemy_database_url)
 
-        _engine = create_engine(
-            sqlalchemy_database_url, connect_args={"check_same_thread": False}
+        _engine = create_async_engine(
+            _db_url, connect_args={"check_same_thread": False}, echo=True
         )
     return _engine
 
 
-def create_session() -> Session:
+async def get_db():
     global _SessionFabric
     if not _SessionFabric:
         _SessionFabric = sessionmaker(
-            autocommit=False, autoflush=False, bind=create_db_engine()
+            expire_on_commit=False, class_=AsyncSession, bind=create_db_engine()
         )
 
-    return _SessionFabric()
-
-
-def get_db() -> Generator:
-    db: Session = create_session()
+    session: AsyncSession = _SessionFabric()
     try:
-        yield db
+        yield session
     finally:
-        db.close()
+        await session.close()
