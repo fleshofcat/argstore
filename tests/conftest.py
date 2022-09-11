@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 import pytest
@@ -14,6 +15,11 @@ def pytest_make_parametrize_id(config, val):
         return repr(val.__name__)
 
     return repr(val)
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    return asyncio.get_event_loop()
 
 
 @pytest.fixture(scope="session")
