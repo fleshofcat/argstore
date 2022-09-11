@@ -14,8 +14,8 @@ def existed_param(client) -> ClientSideParameter:
     response = client.post(
         "/parameters",
         json={
-            "name": "name_to_test_read_params",
-            "value": "value_to_test_read_params",
+            "name": "some_name",
+            "value": "some_value",
         },
         allow_redirects=True,
     )

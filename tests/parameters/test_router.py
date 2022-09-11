@@ -62,14 +62,14 @@ def test_read_not_existing_parameter(client: TestClient, not_existed_param_id: i
 
 
 def test_update_parameter(client: TestClient, existed_param: ClientSideParameter):
-    update_payload = existed_param.copy(update={"value": "updated_value"}).dict()
+    update_payload = existed_param.copy(update={"value": "updated"}).dict()
     update_response = client.put(
         "/parameters", json=update_payload, allow_redirects=True
     )
     assert update_response.status_code == 200, update_response.reason
 
     updated_param = update_response.json()
-    assert updated_param["value"] == "updated_value"
+    assert updated_param["value"] == "updated"
     assert updated_param == update_payload
 
     re_requested_updated_param = client.get(f"/parameters/{updated_param['id']}").json()

@@ -28,5 +28,11 @@ def use_test_db():
 
 
 @pytest.fixture(scope="session")
-def client(use_test_db) -> TestClient:
+def client_without_db() -> TestClient:
     return TestClient(app)
+
+
+@pytest.fixture(scope="session")
+def client(client_without_db, use_test_db) -> TestClient:
+    now_it_is_a_client_with_db = client_without_db
+    return now_it_is_a_client_with_db

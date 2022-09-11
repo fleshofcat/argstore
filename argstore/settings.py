@@ -5,4 +5,4 @@ class Settings(BaseSettings):
     sqlalchemy_database_url: str
 
     class Config:
-        env_file = [".env", "../.env", "../../.env"]
+        env_file = ".env"
