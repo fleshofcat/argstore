@@ -1,13 +1,4 @@
-from fastapi import FastAPI
-from starlette.responses import RedirectResponse
+import uvicorn
 
-from argstore.parameters.router import router
-
-app = FastAPI()
-
-app.include_router(router, prefix="/parameters", tags=["parameters"])
-
-
-@app.get("/")
-def redirect_to_docs_from_root():
-    return RedirectResponse(url="/docs")
+if __name__ == "__main__":
+    uvicorn.run("argstore.app:app", host="0.0.0.0", port=8000, reload=True)

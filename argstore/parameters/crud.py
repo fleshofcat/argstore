@@ -1,56 +1,71 @@
 from sqlalchemy.orm import Session
 
-from argstore.parameters import models, schemas
-
-_possible_types = {"str": str, "int": int}
+from . import models, schemas
 
 
-def _cast_database_parameter_to_schema(param: models.Parameter) -> schemas.Parameter:
-    return schemas.Parameter(
-        id=param.id,
-        name=param.name,
-        value=_possible_types[str(param.type)](param.value),
-    )
-
-
-def map_param_from_schema_to_model_dict(param: schemas.CreateParameter) -> dict:
-    return dict(
-        name=param.name, type=type(param.value).__name__, value=str(param.value)
-    )
-
-
-def create_parameter(db: Session, param: schemas.CreateParameter) -> models.Parameter:
-    db_param = models.Parameter(**map_param_from_schema_to_model_dict(param))
+def create_parameter(
+    db: Session, param: schemas.CreateParameter
+) -> list[models.Parameter]:
+    db_param = models.Parameter(**param.dict())
     db.add(db_param)
     db.commit()
     db.refresh(db_param)
-    return db_param
-
-
-def read_parameter(db: Session, param_id: int) -> models.Parameter | None:
-    return db.query(models.Parameter).filter(models.Parameter.id == param_id).first()
+    return [db_param]
 
 
 def read_parameters(
-    db: Session, skip: int = 0, limit: int = 100
+    db: Session, user_name: str, param_name: str, type_name: str | None = None
 ) -> list[models.Parameter]:
-    return db.query(models.Parameter).offset(skip).limit(limit).all()
+    query = (
+        db.query(models.Parameter)
+        .filter(models.Parameter.Name == param_name)
+        .filter(models.Parameter.Username == user_name)
+    )
+
+    if type_name is not None:
+        query = query.filter(models.Parameter.Type == type_name)
+
+    return query.all()
 
 
-def update_parameter(db: Session, param: schemas.Parameter) -> models.Parameter | None:
+def update_parameter(
+    db: Session, param: schemas.CreateParameter
+) -> list[models.Parameter]:
     if (
         db.query(models.Parameter)
-        .filter(models.Parameter.id == param.id)
-        .update(map_param_from_schema_to_model_dict(param))
+        .filter(models.Parameter.Name == param.Name)
+        .filter(models.Parameter.Username == param.Username)
+        .filter(models.Parameter.Type == param.Type)
+        .update(param.dict())
         > 0
     ):
         db.commit()
-        return read_parameter(db, param.id)
-    return None
+        return read_parameters(
+            db, user_name=param.Username, param_name=param.Name, type_name=param.Type
+        )
+    return []
 
 
-def delete_parameter(db: Session, param_id: int) -> bool:
-    if db.query(models.Parameter).filter(models.Parameter.id == param_id).delete():
+def delete_parameter(
+    db: Session, user_name: str, param_name: str, type_name: str
+) -> bool:
+
+    if (
+        db.query(models.Parameter)
+        .filter(models.Parameter.Name == param_name)
+        .filter(models.Parameter.Username == user_name)
+        .filter(models.Parameter.Type == type_name)
+        .delete()
+    ):
         db.commit()
         return True
     return False
+
+
+def read_all_user_parameters(
+    db: Session,
+    username: str,
+) -> list[models.Parameter]:
+    return (
+        db.query(models.Parameter).filter(models.Parameter.Username == username).all()
+    )
