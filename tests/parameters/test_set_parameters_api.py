@@ -1,15 +1,5 @@
 import pytest
-from pydantic import ValidationError
 from starlette.testclient import TestClient
-
-
-@pytest.fixture(scope="session")
-def username(client: TestClient):
-    user = "test_set_parameters_api_username"
-    try:
-        return client.get(f"/api/users/{user}").json()["Name"]
-    except ValidationError:
-        return client.post("/api/users/", json={"Name": user}).json()["Name"]
 
 
 @pytest.fixture(params=[("str", "test_val"), ("int", "1")])
@@ -37,17 +27,6 @@ def test_set_new_parameter(client: TestClient, param_not_existing_for_user):
     }
 
     assert client.get(url).json() == create_param_response.json()
-
-
-@pytest.fixture(params=[("str", "old_val"), ("int", "0")])
-def param_existing_for_user(client: TestClient, username: str, request):
-    typename, old_value = request.param
-    client.post(
-        f"/api/parameters/{username}/param_name/{typename}",
-        data=old_value,
-        headers={"Content-type": "text/plain"},
-    )
-    return "param_name", username, typename, old_value
 
 
 def test_set_existing_parameter(client: TestClient, param_existing_for_user):
