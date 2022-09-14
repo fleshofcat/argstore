@@ -1,53 +1,8 @@
 import pytest
-from pydantic import BaseModel, parse_obj_as, validator
+from pydantic import parse_obj_as
 from starlette.testclient import TestClient
 
 from tests.parameters.conftest import ClientSideParameter
-
-
-def test_get_parameter(client: TestClient):
-    typename = "str"
-    client.get(f"/api/parameters/<user>/<имя параметра>/{typename}")
-
-    class Param(BaseModel):
-        Name: str
-        Type: str
-
-        @validator("Type")
-        def type_mast_be_str_or_int(cls, type_name):
-            if type_name not in ("str", "int"):
-                raise ValueError(
-                    f"Type mast be 'str' or 'int', got '{type_name}' instead"
-                )
-            return type_name
-
-    assert "list[Parameter](**response.json())"
-    assert "param.Name == 'used_name'"
-    assert "param.Type == 'used_type'"
-    assert "param.Value == 'expected_value'"
-
-
-def test_get_parameter_without_type(client: TestClient):
-    client.get("/api/parameters/<user>/<имя параметра>/")
-    assert "cast response.json() to list[Parameter]"
-    assert "result not empty"
-
-
-@pytest.mark.parametrize("valid_type", ["", "str"])
-def test_get_not_existing_parameter(client: TestClient, valid_type):
-    not_exiting_parameter = ""
-    client.get(f"/api/parameters/<user>/{not_exiting_parameter}/{valid_type}")
-    assert "response.json() == []"
-
-
-@pytest.mark.parametrize("invalid_user", ["", "not_existing_user"])
-@pytest.mark.parametrize("valid_type", ["", "str"])
-def test_get_parameter_with_invalid_user(client: TestClient, invalid_user, valid_type):
-    client.get(f"/api/parameters/{invalid_user}/<имя параметра>/{valid_type}")
-    assert "404 User not found"
-
-
-# ----------------------------------------------------------
 
 
 def test_get_all_user_parameters(client: TestClient):
