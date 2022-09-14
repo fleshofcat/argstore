@@ -2,8 +2,6 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas
 
-_possible_types = {"str": str, "int": int}
-
 
 def create_parameter(
     db: Session, param: schemas.CreateParameter
@@ -15,14 +13,19 @@ def create_parameter(
     return [db_param]
 
 
-def read_parameters(
-    db: Session, skip: int = 0, limit: int = 100
+def read_parameter(
+    db: Session, user_name: str, param_name: str, type_name: str | None = None
 ) -> list[models.Parameter]:
-    return db.query(models.Parameter).offset(skip).limit(limit).all()
+    query = (
+        db.query(models.Parameter)
+        .filter(models.Parameter.Name == param_name)
+        .filter(models.Parameter.Username == user_name)
+    )
 
+    if type_name is not None:
+        query = query.filter(models.Parameter.Type == type_name)
 
-def read_parameter(db: Session, param_id: int) -> models.Parameter | None:
-    return db.query(models.Parameter).filter(models.Parameter.id == param_id).first()
+    return query.all()
 
 
 def update_parameter(
@@ -37,14 +40,10 @@ def update_parameter(
         > 0
     ):
         db.commit()
-        return (
-            db.query(models.Parameter)
-            .filter(models.Parameter.Name == param.Name)
-            .filter(models.Parameter.Username == param.Username)
-            .filter(models.Parameter.Type == param.Type)
-            .all()
+        return read_parameter(
+            db, user_name=param.Username, param_name=param.Name, type_name=param.Type
         )
-    return None
+    return []
 
 
 def delete_parameter(db: Session, param_id: int) -> bool:

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..users.crud import read_user
-from . import crud, models, schemas
+from . import crud, schemas
 
 router = APIRouter()
 
@@ -59,7 +59,6 @@ def set_parameter(
 @router.get(
     "/{user_name}/{param_name}/",
     response_model=list[schemas.Parameter],
-    status_code=200,
 )
 def read_parameter(
     user_name: str,
@@ -67,13 +66,4 @@ def read_parameter(
     type_name: str | None = None,
     db: Session = Depends(get_db),
 ):
-    query = (
-        db.query(models.Parameter)
-        .filter(models.Parameter.Name == param_name)
-        .filter(models.Parameter.Username == user_name)
-    )
-
-    if type_name:
-        query = query.filter(models.Parameter.Type == type_name)
-
-    return query.all()
+    return crud.read_parameter(db, user_name, param_name, type_name)
