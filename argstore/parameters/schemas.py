@@ -7,9 +7,13 @@ class Parameter(BaseModel):
     Value: str
 
     @validator("Name")
-    def name_must_be_not_empty(cls, name: str):
-        if name.strip() == "" or "\t" in name or " " in name:
+    def validate_name(cls, name: str):
+        if name.strip() == "":
             raise ValueError("Name must be not empty")
+
+        if "\t" in name or " " in name:
+            raise ValueError("Name must not contain spaces or tabs")
+
         return name
 
     @validator("Type")
