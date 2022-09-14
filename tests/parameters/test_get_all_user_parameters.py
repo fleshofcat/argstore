@@ -33,3 +33,11 @@ def test_get_all_user_parameters(client: TestClient, username: str):
             "Value": "4",
         },
     ]
+
+
+def test_get_all_parameters_of_user_without_parameters(client: TestClient):
+    client.post("/api/users/", json={"Name": "user_without_params"})
+
+    params_of_new_user_response = client.get("/api/parameters/user_without_params")
+    assert params_of_new_user_response.status_code == 200
+    assert params_of_new_user_response.json() == []
