@@ -22,15 +22,14 @@ def set_parameter(
 ):
     supported_types = {"str": str, "int": int}
 
-    if type_name not in supported_types:
+    try:
+        supported_types[type_name](value)
+    except KeyError:
         raise HTTPException(
             status_code=404,
             detail=f"Support for type: {type_name} not found. "
             "supported types: 'str', 'int'",
         )
-
-    try:
-        supported_types[type_name](value)
     except ValueError:
         raise HTTPException(
             status_code=422, detail=f"Type-value mismatch. {type_name=}, {value=}"
