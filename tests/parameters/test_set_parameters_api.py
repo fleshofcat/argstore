@@ -60,21 +60,6 @@ def test_set_parameter_with_not_valid_type(
     assert "detail" in set_with_not_valid_type_response.json()
 
 
-@pytest.fixture
-def existed_int_param(client: TestClient, username):
-    return client.post(
-        f"/api/parameters/{username}/existed_param/int",
-        data="1",
-        headers={"Content-type": "text/plain"},
-    ).json()["Name"]
-
-
-@pytest.fixture
-def not_existed_int_param(client: TestClient, username):
-    client.delete(f"/api/parameters/{username}/not_existed_param/int")
-    return "not_existed_param"
-
-
 @pytest.fixture(scope="session")
 def init_existed_and_not_existed_int_params(client: TestClient, username: str):
     existed, not_existed = "existed_param", "not_existed_param"
