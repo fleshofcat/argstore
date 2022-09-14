@@ -5,12 +5,14 @@ from . import models, schemas
 _possible_types = {"str": str, "int": int}
 
 
-def create_parameter(db: Session, param: schemas.CreateParameter) -> models.Parameter:
+def create_parameter(
+    db: Session, param: schemas.CreateParameter
+) -> list[models.Parameter]:
     db_param = models.Parameter(**param.dict())
     db.add(db_param)
     db.commit()
     db.refresh(db_param)
-    return db_param
+    return [db_param]
 
 
 def read_parameters(
@@ -25,7 +27,7 @@ def read_parameter(db: Session, param_id: int) -> models.Parameter | None:
 
 def update_parameter(
     db: Session, param: schemas.CreateParameter
-) -> models.Parameter | None:
+) -> list[models.Parameter] | None:
     if (
         db.query(models.Parameter)
         .filter(models.Parameter.Name == param.Name)
@@ -40,7 +42,7 @@ def update_parameter(
             .filter(models.Parameter.Name == param.Name)
             .filter(models.Parameter.Username == param.Username)
             .filter(models.Parameter.Type == param.Type)
-            .first()
+            .all()
         )
     return None
 

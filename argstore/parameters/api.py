@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..users.models import User
+from ..users.crud import read_user
 from . import crud, models, schemas
 
 router = APIRouter()
@@ -39,36 +39,16 @@ def set_parameter(
         Name=param_name, Type=type_name, Value=value, Username=user_name
     )
 
-    # TODO Move it to users/crud.py
-    if db.query(User).where(User.Name == param.Username).first() is None:
+    if read_user(db, param.Username) is None:
         raise HTTPException(
             status_code=404, detail=f"User: '{param.Username}' not found"
         )
-
-    updated_rows = (
-        db.query(models.Parameter)
-        .filter(models.Parameter.Name == param.Name)
-        .filter(models.Parameter.Username == param.Username)
-        .filter(models.Parameter.Type == param.Type)
-        .update(param.dict())
-    )
-
-    if updated_rows > 0:
+    if db_param := crud.update_parameter(db, param):
         response.status_code = status.HTTP_200_OK
-        db_param = (
-            db.query(models.Parameter)
-            .filter(models.Parameter.Name == param_name)
-            .filter(models.Parameter.Username == user_name)
-            .filter(models.Parameter.Type == type_name)
-            .first()
-        )
+        return db_param
     else:
         response.status_code = status.HTTP_201_CREATED
-        return [crud.create_parameter(db, param)]
-
-    db.commit()
-    db.refresh(db_param)
-    return [db_param]
+        return crud.create_parameter(db, param)
 
 
 @router.get(
