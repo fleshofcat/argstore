@@ -6,7 +6,7 @@ _possible_types = {"str": str, "int": int}
 
 
 def create_parameter(db: Session, param: schemas.CreateParameter) -> models.Parameter:
-    db_param = models.Parameter(param.dict())
+    db_param = models.Parameter(**param.dict())
     db.add(db_param)
     db.commit()
     db.refresh(db_param)
