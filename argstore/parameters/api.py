@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from argstore.database import get_db
-from argstore.parameters import crud, models, schemas
-from argstore.users.models import User
+from ..database import get_db
+from ..users.models import User
+from . import crud, models, schemas
 
 router = APIRouter()
 
@@ -77,22 +77,24 @@ def set_parameter(
     response_model=list[schemas.Parameter],
     status_code=200,
 )
+@router.get(
+    "/{user_name}/{param_name}/",
+    response_model=list[schemas.Parameter],
+    status_code=200,
+)
 def read_parameter(
     user_name: str,
     param_name: str,
-    type_name: str,
+    type_name: str | None = None,
     db: Session = Depends(get_db),
 ):
-    db_param = (
+    query = (
         db.query(models.Parameter)
         .filter(models.Parameter.Name == param_name)
         .filter(models.Parameter.Username == user_name)
-        .filter(models.Parameter.Type == type_name)
-        .first()
     )
-    if db_param is None:
-        raise HTTPException(
-            status_code=404, detail=f"Parameter: '{param_name}' not found"
-        )
 
-    return [db_param]
+    if type_name:
+        query = query.filter(models.Parameter.Type == type_name)
+
+    return query.all()

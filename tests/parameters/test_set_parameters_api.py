@@ -48,7 +48,7 @@ def test_set_existing_parameter(client: TestClient, param_existing_for_user):
     )
 
 
-@pytest.mark.parametrize("not_valid_type", ["", "float", "qwerty", "1"])
+@pytest.mark.parametrize("not_valid_type", ["float", "qwerty", "1"])
 def test_set_parameter_with_not_valid_type(
     client: TestClient, username: str, not_valid_type
 ):
@@ -58,7 +58,9 @@ def test_set_parameter_with_not_valid_type(
         data="value",
         headers={"Content-type": "text/plain"},
     )
-    assert set_with_not_valid_type_response.status_code == 404
+    assert (
+        set_with_not_valid_type_response.status_code == 404
+    ), set_with_not_valid_type_response.reason
     assert "detail" in set_with_not_valid_type_response.json()
 
 
@@ -115,4 +117,4 @@ def test_set_parameter_with_not_existing_user(
     )
 
     assert response.status_code == 404
-    assert client.get(url_with_not_existing_user).status_code == 404
+    assert client.get(url_with_not_existing_user).json() == []
