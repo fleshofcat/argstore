@@ -46,8 +46,17 @@ def update_parameter(
     return []
 
 
-def delete_parameter(db: Session, param_id: int) -> bool:
-    if db.query(models.Parameter).filter(models.Parameter.id == param_id).delete():
+def delete_parameter(
+    db: Session, user_name: str, param_name: str, type_name: str
+) -> bool:
+
+    if (
+        db.query(models.Parameter)
+        .filter(models.Parameter.Name == param_name)
+        .filter(models.Parameter.Username == user_name)
+        .filter(models.Parameter.Type == type_name)
+        .delete()
+    ):
         db.commit()
         return True
     return False

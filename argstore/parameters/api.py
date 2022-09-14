@@ -75,3 +75,21 @@ def read_all_user_parameters(username: str, db: Session = Depends(get_db)):
         return crud.read_all_user_parameters(db, username)
     else:
         raise HTTPException(status_code=404, detail=f"User: '{username}' not found")
+
+
+@router.delete("/{user_name}/{param_name}/{type_name}", status_code=204)
+def delete_param(
+    user_name: str,
+    param_name: str,
+    type_name: str,
+    db: Session = Depends(get_db),
+):
+    if not crud.delete_parameter(
+        db, user_name=user_name, param_name=param_name, type_name=type_name
+    ):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parameter: '{param_name}' "
+            f"with user: '{user_name}' "
+            f"and type: '{type_name}' not found",
+        )

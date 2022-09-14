@@ -5,7 +5,7 @@ from starlette.testclient import TestClient
 
 @pytest.fixture(scope="session")
 def username(client: TestClient):
-    user = "test_set_parameters_api_username"
+    user = "test_parameters_api_username"
     try:
         return client.get(f"/api/users/{user}").json()["Name"]
     except ValidationError:

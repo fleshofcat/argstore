@@ -1,8 +1,9 @@
 from starlette.testclient import TestClient
 
 
-def test_delete_parameter(client: TestClient, existed_param):
-    assert client.delete(f"/parameters/{existed_param.id}").status_code == 204
-    assert client.delete(f"/parameters/{existed_param.id}").status_code == 404
+def test_delete_parameter(client: TestClient, username: str):
+    param_url = f"/api/parameters/{username}/param_to_delete/str"
+    client.post(param_url, data="val", headers={"Content-type": "text/plain"})
 
-    assert "detail" in client.delete(f"/parameters/{existed_param.id}").json()
+    assert client.delete(param_url).status_code == 204
+    assert client.delete(param_url).status_code == 404
