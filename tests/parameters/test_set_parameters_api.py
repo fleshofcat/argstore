@@ -20,11 +20,13 @@ def test_set_new_parameter(client: TestClient, param_not_existing_for_user):
     )
 
     assert create_param_response.status_code == 201
-    assert create_param_response.json() == {
-        "Name": not_existing_param_name,
-        "Type": typename,
-        "Value": test_value,
-    }
+    assert create_param_response.json() == [
+        {
+            "Name": not_existing_param_name,
+            "Type": typename,
+            "Value": test_value,
+        }
+    ]
 
     assert client.get(url).json() == create_param_response.json()
 
@@ -39,7 +41,7 @@ def test_set_existing_parameter(client: TestClient, param_existing_for_user):
         headers={"Content-type": "text/plain"},
     )
     assert updated_param_response.status_code == 200
-    assert updated_param_response.json()["Value"] == new_value
+    assert updated_param_response.json()[0]["Value"] == new_value
     assert (
         client.get(f"/api/parameters/{user}/{param}/{typename}").json()
         == updated_param_response.json()

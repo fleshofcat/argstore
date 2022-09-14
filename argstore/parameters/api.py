@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.post(
     "/{user_name}/{param_name}/{type_name}",
-    response_model=schemas.Parameter,
+    response_model=list[schemas.Parameter],
 )
 def set_parameter(
     user_name: str,
@@ -65,16 +65,16 @@ def set_parameter(
         )
     else:
         response.status_code = status.HTTP_201_CREATED
-        return crud.create_parameter(db, param)
+        return [crud.create_parameter(db, param)]
 
     db.commit()
     db.refresh(db_param)
-    return db_param
+    return [db_param]
 
 
 @router.get(
     "/{user_name}/{param_name}/{type_name}",
-    response_model=schemas.Parameter,
+    response_model=list[schemas.Parameter],
     status_code=200,
 )
 def read_parameter(
@@ -95,4 +95,4 @@ def read_parameter(
             status_code=404, detail=f"Parameter: '{param_name}' not found"
         )
 
-    return db_param
+    return [db_param]
