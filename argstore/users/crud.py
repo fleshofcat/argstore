@@ -19,16 +19,6 @@ def read_users(db: Session, skip: int = 0, limit: int = 100) -> list[models.User
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
-def update_user(db: Session, user: schemas.User) -> models.User | None:
-    if (
-        db.query(models.User).filter(models.User.Name == user.Name).update(user.dict())
-        > 0
-    ):
-        db.commit()
-        return read_user(db, user.Name)
-    return None
-
-
 def delete_user(db: Session, username: str) -> bool:
     if db.query(models.User).filter(models.User.Name == username).delete():
         db.commit()
