@@ -1,5 +1,4 @@
 import pytest
-from pydantic import ValidationError
 from starlette.testclient import TestClient
 
 
@@ -8,7 +7,7 @@ def username(client: TestClient):
     user = "test_parameters_api_username"
     try:
         return client.get(f"/api/users/{user}").json()["Name"]
-    except ValidationError:
+    except KeyError:
         return client.post("/api/users/", json={"Name": user}).json()["Name"]
 
 

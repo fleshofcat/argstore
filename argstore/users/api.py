@@ -19,7 +19,10 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @router.get("/{username}", response_model=schemas.User)
 def read_user(username: str, db: Session = Depends(get_db)):
-    return crud.read_user(db, username)
+    if user := crud.read_user(db, username):
+        return user
+    else:
+        raise HTTPException(status_code=404, detail=f"User: '{username}' not found")
 
 
 @router.delete("/{username}", status_code=204)

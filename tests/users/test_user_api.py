@@ -8,6 +8,10 @@ def test_create_read_user(client: TestClient):
     assert client.get("/api/users/Bob").json() == bob_response.json()
 
 
+def test_read_not_existing_user(client: TestClient):
+    assert client.get("/api/users/not_existing_user").status_code == 404
+
+
 def test_read_users(client: TestClient):
     client.post("/api/users/", json={"Name": "Alice"})
     client.post("/api/users/", json={"Name": "John"})
@@ -35,3 +39,13 @@ def test_read_users(client: TestClient):
 
     # Test limit arg
     assert len(client.get("/api/users/", params={"limit": 1}).json()) == 1
+
+
+def test_delete_user(client: TestClient):
+    client.post("/api/users/", json={"Name": "user_to_del"})
+    assert client.get("/api/users/user_to_del").status_code == 200
+
+    assert client.delete("/api/users/user_to_del").status_code == 204
+    assert client.delete("/api/users/user_to_del").status_code == 404
+
+    assert client.get("/api/users/user_to_del").status_code == 404
