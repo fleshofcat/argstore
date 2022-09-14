@@ -41,3 +41,9 @@ def test_get_all_parameters_of_user_without_parameters(client: TestClient):
     params_of_new_user_response = client.get("/api/parameters/user_without_params")
     assert params_of_new_user_response.status_code == 200
     assert params_of_new_user_response.json() == []
+
+
+def test_get_all_parameters_of_not_existing_user(client: TestClient):
+    params_not_existing_user_response = client.get("/api/parameters/not_existing_user")
+    assert params_not_existing_user_response.status_code == 404
+    assert "detail" in params_not_existing_user_response.json()
