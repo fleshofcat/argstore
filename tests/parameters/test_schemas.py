@@ -15,3 +15,9 @@ def test_parameter_schema(name, typename, value):
 def test_parameter_schema_name_validation(bad_name):
     with pytest.raises(ValidationError):
         Parameter(**{"Name": bad_name, "Type": "str", "Value": "val"})
+
+
+@pytest.mark.parametrize("bad_type", ["float", " ", "\t", "123", "qwerty"])
+def test_parameter_schema_type_validation(bad_type):
+    with pytest.raises(ValidationError):
+        Parameter(**{"Name": "name", "Type": bad_type, "Value": "val"})
