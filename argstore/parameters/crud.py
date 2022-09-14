@@ -51,3 +51,12 @@ def delete_parameter(db: Session, param_id: int) -> bool:
         db.commit()
         return True
     return False
+
+
+def read_all_user_parameters(
+    db: Session,
+    username: str,
+) -> list[models.Parameter]:
+    return (
+        db.query(models.Parameter).filter(models.Parameter.Username == username).all()
+    )

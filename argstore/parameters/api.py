@@ -67,3 +67,11 @@ def read_parameter(
     db: Session = Depends(get_db),
 ):
     return crud.read_parameter(db, user_name, param_name, type_name)
+
+
+@router.get("/{username}", response_model=list[schemas.Parameter])
+def read_all_user_parameters(username: str, db: Session = Depends(get_db)):
+    if read_user(db, username):
+        return crud.read_all_user_parameters(db, username)
+    else:
+        raise HTTPException(status_code=404, detail=f"User: '{username}' not found")

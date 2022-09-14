@@ -5,20 +5,6 @@ from starlette.testclient import TestClient
 from tests.parameters.conftest import ClientSideParameter
 
 
-def test_get_all_user_parameters(client: TestClient):
-    client.get("/api/parameters/<user_with_params>")
-    assert "cast r.json() to list[Parameter]"
-    assert "params != []"
-
-
-def test_get_all_parameters_of_user_without_parameters(client: TestClient):
-    client.get("/api/parameters/<user_without_params>")
-    assert "r.json() == []"
-
-
-# -----------------------------------------------------
-
-
 def test_set_parameters_with_json_api(client: TestClient):
     created_params = client.post(
         "/api/<existing_user>",
