@@ -30,7 +30,7 @@ def read_parameters(
 
 def update_parameter(
     db: Session, param: schemas.CreateParameter
-) -> list[models.Parameter] | None:
+) -> list[models.Parameter]:
     if (
         db.query(models.Parameter)
         .filter(models.Parameter.Name == param.Name)

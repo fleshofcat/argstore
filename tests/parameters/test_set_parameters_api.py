@@ -31,7 +31,7 @@ def test_set_new_parameter(client: TestClient, param_not_existing_for_user):
     assert client.get(url).json() == create_param_response.json()
 
 
-def test_set_existing_parameter(client: TestClient, param_existing_for_user):
+def test_update_parameter(client: TestClient, param_existing_for_user):
     param, user, typename, old_value = param_existing_for_user
     new_value = old_value * 2
 
