@@ -7,8 +7,8 @@ class Parameter(BaseModel):
     Value: str
 
     @validator("Name")
-    def name_must_be_not_empty(cls, name):
-        if name == "":
+    def name_must_be_not_empty(cls, name: str):
+        if name.strip() == "" or "\t" in name or " " in name:
             raise ValueError("Name must be not empty")
         return name
 
