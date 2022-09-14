@@ -3,8 +3,8 @@ import os
 import pytest
 from starlette.testclient import TestClient
 
+from argstore.app import app
 from argstore.database import Base, create_db_engine
-from argstore.main import app
 
 
 # noinspection PyUnusedLocal
