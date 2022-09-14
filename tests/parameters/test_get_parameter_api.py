@@ -40,15 +40,19 @@ def test_get_parameter_without_type(client: TestClient, username):
     ]
 
 
-@pytest.mark.parametrize("valid_type", ["", "str"])
-def test_get_not_existing_parameter(client: TestClient, valid_type):
-    not_exiting_parameter = ""
-    client.get(f"/api/parameters/<user>/{not_exiting_parameter}/{valid_type}")
-    assert "response.json() == []"
+@pytest.mark.parametrize("typename", ["int", "str"])
+def test_get_not_existing_parameter(client: TestClient, typename, username):
+    not_existing_parameter_response = client.get(
+        f"/api/parameters/{username}/not_exiting_parameter/{typename}"
+    )
+
+    assert not_existing_parameter_response.status_code == 204
+    assert not_existing_parameter_response.reason == "No Content"
+    assert not_existing_parameter_response.json() == []
 
 
 @pytest.mark.parametrize("invalid_user", ["", "not_existing_user"])
-@pytest.mark.parametrize("valid_type", ["", "str"])
-def test_get_parameter_with_invalid_user(client: TestClient, invalid_user, valid_type):
-    client.get(f"/api/parameters/{invalid_user}/<имя параметра>/{valid_type}")
-    assert "404 User not found"
+def test_get_parameter_with_invalid_user(client: TestClient, invalid_user):
+    assert (
+        client.get(f"/api/parameters/{invalid_user}/param_name/str").status_code == 404
+    )

@@ -1,5 +1,4 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import RelationshipProperty, relationship
 
 from ..database import Base
 
@@ -13,7 +12,3 @@ class Parameter(Base):  # type: ignore
     Value = Column(String)
 
     Username = Column(String(100), ForeignKey("users.Name"))
-
-    User: RelationshipProperty = relationship(
-        "User", back_populates="Parameters", uselist=False
-    )

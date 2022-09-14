@@ -35,14 +35,13 @@ def set_parameter(
             status_code=422, detail=f"Type-value mismatch. {type_name=}, {value=}"
         )
 
+    if read_user(db, user_name) is None:
+        raise HTTPException(status_code=404, detail=f"User: '{user_name}' not found")
+
     param = schemas.CreateParameter(
         Name=param_name, Type=type_name, Value=value, Username=user_name
     )
 
-    if read_user(db, param.Username) is None:
-        raise HTTPException(
-            status_code=404, detail=f"User: '{param.Username}' not found"
-        )
     if db_param := crud.update_parameter(db, param):
         response.status_code = status.HTTP_200_OK
         return db_param
@@ -54,19 +53,26 @@ def set_parameter(
 @router.get(
     "/{user_name}/{param_name}/{type_name}",
     response_model=list[schemas.Parameter],
-    status_code=200,
 )
 @router.get(
     "/{user_name}/{param_name}/",
     response_model=list[schemas.Parameter],
 )
 def read_parameter(
+    response: Response,
     user_name: str,
     param_name: str,
     type_name: str | None = None,
     db: Session = Depends(get_db),
 ):
-    return crud.read_parameter(db, user_name, param_name, type_name)
+    if read_user(db, user_name):
+        if params := crud.read_parameters(db, user_name, param_name, type_name):
+            return params
+        else:
+            response.status_code = status.HTTP_204_NO_CONTENT
+            return []
+    else:
+        raise HTTPException(status_code=404, detail=f"User: '{user_name}' not found")
 
 
 @router.get("/{username}", response_model=list[schemas.Parameter])

@@ -117,4 +117,3 @@ def test_set_parameter_with_not_existing_user(
     )
 
     assert response.status_code == 404
-    assert client.get(url_with_not_existing_user).json() == []

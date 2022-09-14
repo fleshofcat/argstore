@@ -13,7 +13,7 @@ def create_parameter(
     return [db_param]
 
 
-def read_parameter(
+def read_parameters(
     db: Session, user_name: str, param_name: str, type_name: str | None = None
 ) -> list[models.Parameter]:
     query = (
@@ -40,7 +40,7 @@ def update_parameter(
         > 0
     ):
         db.commit()
-        return read_parameter(
+        return read_parameters(
             db, user_name=param.Username, param_name=param.Name, type_name=param.Type
         )
     return []

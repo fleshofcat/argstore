@@ -9,4 +9,4 @@ class User(Base):  # type: ignore
 
     Name = Column(String(100), primary_key=True, index=True, unique=True)
 
-    Parameters: RelationshipProperty = relationship("Parameter", back_populates="User")
+    Parameters: RelationshipProperty = relationship("Parameter")
