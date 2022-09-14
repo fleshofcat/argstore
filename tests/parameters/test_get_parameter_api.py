@@ -51,8 +51,10 @@ def test_get_not_existing_parameter(client: TestClient, typename, username):
     assert not_existing_parameter_response.json() == []
 
 
-@pytest.mark.parametrize("invalid_user", ["", "not_existing_user"])
-def test_get_parameter_with_invalid_user(client: TestClient, invalid_user):
-    assert (
-        client.get(f"/api/parameters/{invalid_user}/param_name/str").status_code == 404
+def test_get_parameter_with_invalid_user(client: TestClient):
+    param_with_invalid_user_response = client.get(
+        "/api/parameters/not_existing_user/param_name/str"
     )
+    assert param_with_invalid_user_response.status_code == 404
+    assert "User" in param_with_invalid_user_response.json()["detail"]
+    assert "not found" in param_with_invalid_user_response.json()["detail"]
