@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..users.crud import read_user
 from . import crud, schemas
+from .schemas import SupportedType
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ router = APIRouter()
 def set_parameter(
     user_name: str,
     param_name: str,
-    type_name: str,
+    type_name: SupportedType,
     response: Response,
     value: str = Body(media_type="text/plain"),
     db: Session = Depends(get_db),
@@ -24,12 +25,6 @@ def set_parameter(
 
     try:
         supported_types[type_name](value)
-    except KeyError:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Support for type: {type_name} not found. "
-            "supported types: 'str', 'int'",
-        )
     except ValueError:
         raise HTTPException(
             status_code=422, detail=f"Type-value mismatch. {type_name=}, {value=}"
@@ -62,7 +57,7 @@ def read_parameter(
     response: Response,
     user_name: str,
     param_name: str,
-    type_name: str | None = None,
+    type_name: SupportedType | None = None,
     db: Session = Depends(get_db),
 ):
     if read_user(db, user_name):
@@ -79,7 +74,7 @@ def read_parameter(
 def delete_param(
     user_name: str,
     param_name: str,
-    type_name: str,
+    type_name: SupportedType,
     db: Session = Depends(get_db),
 ):
     if not crud.delete_parameter(

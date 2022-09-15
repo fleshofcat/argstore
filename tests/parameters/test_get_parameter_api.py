@@ -17,6 +17,13 @@ def test_get_parameter(client: TestClient, param_existing_for_user):
     ]
 
 
+@pytest.mark.parametrize("bad_type", [" ", "type", "float"])
+def test_get_parameter_with_invalid_type(client: TestClient, username, bad_type):
+    get_param_response = client.get(f"/api/parameters/{username}/param_name/{bad_type}")
+    assert get_param_response.status_code == 422
+    assert "detail" in get_param_response.json()
+
+
 def test_get_parameter_without_type(client: TestClient, username):
     param = "param_to_test_get_without_type"
     h = {"Content-type": "text/plain"}

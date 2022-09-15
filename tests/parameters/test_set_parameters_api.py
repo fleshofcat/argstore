@@ -59,8 +59,8 @@ def test_set_parameter_with_not_valid_type(
         headers={"Content-type": "text/plain"},
     )
     assert (
-        set_with_not_valid_type_response.status_code == 404
-    ), set_with_not_valid_type_response.reason
+        set_with_not_valid_type_response.status_code == 422
+    ), set_with_not_valid_type_response.json()
     assert "detail" in set_with_not_valid_type_response.json()
 
 
