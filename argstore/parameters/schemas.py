@@ -1,9 +1,16 @@
+from enum import Enum
+
 from pydantic import BaseModel, StrictStr, validator
+
+
+class SupportedType(str, Enum):
+    str = "str"
+    int = "int"
 
 
 class Parameter(BaseModel):
     Name: StrictStr
-    Type: StrictStr
+    Type: SupportedType
     Value: str
 
     @validator("Name")
@@ -15,12 +22,6 @@ class Parameter(BaseModel):
             raise ValueError("Name must not contain spaces or tabs")
 
         return name
-
-    @validator("Type")
-    def type_mast_be_str_or_int(cls, type_name):
-        if type_name not in ("str", "int"):
-            raise ValueError(f"Type mast be 'str' or 'int', got '{type_name}' instead")
-        return type_name
 
     class Config:
         orm_mode = True
