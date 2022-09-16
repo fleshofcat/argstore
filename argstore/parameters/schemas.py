@@ -1,4 +1,6 @@
+import typing
 from enum import Enum
+from pydoc import locate
 
 from pydantic import BaseModel, StrictStr, validator
 
@@ -22,6 +24,19 @@ class Parameter(BaseModel):
             raise ValueError("Name must not contain spaces or tabs")
 
         return name
+
+    @validator("Value")
+    def validate_type_value_compatibility(cls, value: str, values: dict):
+        type_name = ""
+
+        try:
+            type_name = values["Type"].value
+            CurrentType = typing.cast(typing.Type, locate(type_name))
+            CurrentType(value)
+        except (ValueError, KeyError):
+            raise ValueError(f"Type-value mismatch. {type_name=}, {value=}")
+
+        return value
 
     class Config:
         orm_mode = True
