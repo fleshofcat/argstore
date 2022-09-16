@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -21,28 +22,27 @@ def set_parameter(
     value: str = Body(media_type="text/plain"),
     db: Session = Depends(get_db),
 ):
-    supported_types = {"str": str, "int": int}
-
     try:
-        supported_types[type_name](value)
-    except ValueError:
-        raise HTTPException(
-            status_code=422, detail=f"Type-value mismatch. {type_name=}, {value=}"
+        assert read_user(db, user_name), f"User: '{user_name}' not found"
+        param = schemas.CreateParameter(
+            Name=param_name,
+            Type=type_name,
+            Value=value,
+            Username=user_name,
         )
 
-    if read_user(db, user_name) is None:
-        raise HTTPException(status_code=404, detail=f"User: '{user_name}' not found")
+        if db_param := crud.update_parameter(db, param):
+            response.status_code = status.HTTP_200_OK
+            return db_param
+        else:
+            response.status_code = status.HTTP_201_CREATED
+            return crud.create_parameter(db, param)
 
-    param = schemas.CreateParameter(
-        Name=param_name, Type=type_name, Value=value, Username=user_name
-    )
+    except AssertionError as err:
+        raise HTTPException(status_code=404, detail=str(err))
 
-    if db_param := crud.update_parameter(db, param):
-        response.status_code = status.HTTP_200_OK
-        return db_param
-    else:
-        response.status_code = status.HTTP_201_CREATED
-        return crud.create_parameter(db, param)
+    except ValidationError as err:
+        raise HTTPException(status_code=422, detail=str(err))
 
 
 @router.get(
