@@ -94,3 +94,42 @@ def read_all_user_parameters(username: str, db: Session = Depends(get_db)):
         return crud.read_all_user_parameters(db, username)
     else:
         raise HTTPException(status_code=404, detail=f"User: '{username}' not found")
+
+
+@router.post("/{user_name}", response_model=schemas.JsonApiResult)
+def set_parameter_with_json_api(
+    user_name: str,
+    query: schemas.JsonApiQuery,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    user_exists = bool(read_user(db, user_name))
+
+    if not user_exists:
+        response.status_code = status.HTTP_404_NOT_FOUND
+
+    result = schemas.JsonApiResult(Result=[])
+
+    for q in query.Query:
+        param = schemas.CreateParameter(
+            Name=q.Name,
+            Type=q.Type,
+            Value=q.Value,
+            Username=user_name,
+        )
+
+        result_status = schemas.Status.ERROR
+
+        if user_exists:
+            if crud.update_parameter(db, param):
+                result_status = schemas.Status.OK
+            elif crud.create_parameter(db, param):
+                result_status = schemas.Status.OK
+
+        result.Result += [
+            schemas.JsonApiResultMessage(
+                Operation=q.Operation, Name=q.Name, Type=q.Type, Status=result_status
+            )
+        ]
+
+    return result

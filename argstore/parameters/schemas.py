@@ -44,3 +44,47 @@ class Parameter(BaseModel):
 
 class CreateParameter(Parameter):
     Username: str
+
+
+class JsonApiOperation(str, Enum):
+    SetParam = "SetParam"
+
+
+class JsonApiMessage(BaseModel):
+    Operation: JsonApiOperation
+    Name: StrictStr
+    Type: SupportedType
+
+
+class JsonApiQueryMessage(JsonApiMessage):
+    Value: str
+
+    @validator("Value")
+    def validate_type_value_compatibility(cls, value: str, values: dict):
+        type_name = ""
+
+        try:
+            type_name = values["Type"].value
+            CurrentType = typing.cast(typing.Type, locate(type_name))
+            CurrentType(value)
+        except (ValueError, KeyError):
+            raise ValueError(f"Type-value mismatch. {type_name=}, {value=}")
+
+        return value
+
+
+class Status(str, Enum):
+    OK = "OK"
+    ERROR = "ERROR"
+
+
+class JsonApiResultMessage(JsonApiMessage):
+    Status: Status
+
+
+class JsonApiQuery(BaseModel):
+    Query: list[JsonApiQueryMessage]
+
+
+class JsonApiResult(BaseModel):
+    Result: list[JsonApiResultMessage]
