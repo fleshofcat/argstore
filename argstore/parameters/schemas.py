@@ -74,7 +74,7 @@ class JsonApiQueryMessage(JsonApiMessage):
 
 
 class Status(str, Enum):
-    OK = ("OK",)
+    OK = "OK"
     ERROR = "ERROR"
 
 
