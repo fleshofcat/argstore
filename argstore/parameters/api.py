@@ -96,7 +96,10 @@ def read_all_user_parameters(username: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=f"User: '{username}' not found")
 
 
-@router.post("/{user_name}", response_model=schemas.JsonApiResult)
+json_api_router = APIRouter()
+
+
+@json_api_router.post("/{user_name}", response_model=schemas.JsonApiResult)
 def set_parameter_with_json_api(
     user_name: str,
     query: schemas.JsonApiQuery,

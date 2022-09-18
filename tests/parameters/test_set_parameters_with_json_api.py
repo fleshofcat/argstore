@@ -4,7 +4,7 @@ from starlette.testclient import TestClient
 
 def test_set_parameters_with_json_api(client: TestClient, username: str):
     created_params = client.post(
-        f"/api/parameters/{username}",
+        f"/api/{username}",
         json={
             "Query": [
                 {
@@ -64,7 +64,7 @@ def test_set_parameters_with_json_api_with_operations_on_the_same_parameter(
     client: TestClient, username: str
 ):
     created_params = client.post(
-        f"/api/parameters/{username}",
+        f"/api/{username}",
         json={
             "Query": [
                 {
@@ -113,7 +113,7 @@ def test_set_parameters_with_json_api_with_operations_on_the_same_parameter(
 def test_set_parameters_with_json_api_with_empty_query_list(
     client: TestClient, username: str
 ):
-    created_params = client.post(f"/api/parameters/{username}", json={"Query": []})
+    created_params = client.post(f"/api/{username}", json={"Query": []})
     assert created_params.status_code == 200, created_params.json()
     assert created_params.json() == {"Result": []}
 
@@ -144,16 +144,14 @@ def test_set_parameters_with_json_api_with_empty_query_list(
 def test_set_parameters_with_json_api_with_invalid_payload(
     client: TestClient, username: str, bad_payload: dict | list
 ):
-    created_params_response = client.post(
-        f"/api/parameters/{username}", json=bad_payload
-    )
+    created_params_response = client.post(f"/api/{username}", json=bad_payload)
     assert created_params_response.status_code == 422, created_params_response.json()
     assert "detail" in created_params_response.json()
 
 
 def test_set_parameters_with_json_api_with_invalid_user(client: TestClient):
     created_params = client.post(
-        "/api/parameters/not_existed_user",
+        "/api/not_existed_user",
         json={
             "Query": [
                 {
