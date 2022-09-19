@@ -5,14 +5,15 @@ from sqlalchemy import engine_from_config, pool
 
 from argstore.database import Base
 from argstore.parameters.models import Parameter  # noqa: F401
+from argstore.settings import Settings
 from argstore.users.models import User  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# # NOTE The line is reusing sqlalchemy db url from .env
-# config.set_main_option("sqlalchemy.url", Settings().sqlalchemy_database_url)
+# NOTE The line is reusing sqlalchemy db url from .env
+config.set_main_option("sqlalchemy.url", Settings().sqlalchemy_database_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
