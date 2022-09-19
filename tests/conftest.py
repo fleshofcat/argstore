@@ -3,6 +3,7 @@ import os
 import pytest
 from starlette.testclient import TestClient
 
+from argstore import database
 from argstore.app import app
 from argstore.database import Base, create_db_engine
 
@@ -36,3 +37,20 @@ def client_without_db() -> TestClient:
 def client(client_without_db, use_test_db) -> TestClient:
     now_it_is_a_client_with_db = client_without_db
     return now_it_is_a_client_with_db
+
+
+@pytest.fixture
+def db_is_not_initialized():
+    # noinspection PyProtectedMember
+    old_engine = database._engine
+
+    # noinspection PyProtectedMember
+    old_SessionFabric = database._SessionFabric
+
+    database._engine = None
+    database._SessionFabric = None
+
+    yield
+
+    database._engine = old_engine
+    database._SessionFabric = old_SessionFabric
