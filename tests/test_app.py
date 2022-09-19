@@ -21,7 +21,7 @@ def test_init_db_if_necessary(mocker: MockFixture, db_is_not_initialized):
         os.environ,
         {
             "SQLALCHEMY_DATABASE_URL": f"sqlite:///{db_name}",
-            "init_not_existed_db": "True",
+            "INIT_NOT_EXISTED_DB": "True",
         },
     )
 
@@ -30,8 +30,15 @@ def test_init_db_if_necessary(mocker: MockFixture, db_is_not_initialized):
 
 
 def test_init_db_with_existed_db(mocker: MockFixture, use_test_db):
+    from argstore.database import _engine
+
+    db_url = str(_engine.url)  # type: ignore
+
     metadata_mock = mocker.patch.object(Base, "metadata")
-    mocker.patch.dict(os.environ, {"init_not_existed_db": "True"})
+    mocker.patch.dict(
+        os.environ,
+        {"SQLALCHEMY_DATABASE_URL": db_url, "INIT_NOT_EXISTED_DB": "True"},
+    )
 
     with TestClient(app):
         assert not metadata_mock.create_all.called
@@ -44,7 +51,7 @@ def test_init_db_when_it_is_disabled(mocker: MockFixture):
         os.environ,
         {
             "SQLALCHEMY_DATABASE_URL": "sqlite:///db_to_test_disabled_auto_init.db",
-            "init_not_existed_db": "False",
+            "INIT_NOT_EXISTED_DB": "False",
         },
     )
 
@@ -54,7 +61,9 @@ def test_init_db_when_it_is_disabled(mocker: MockFixture):
 
 def test_init_db_with_no_db_specified(mocker: MockFixture):
     metadata_mock = mocker.patch.object(Base, "metadata")
-    mocker.patch.dict(os.environ, {"init_not_existed_db": "True"})
+    mocker.patch.dict(
+        os.environ, {"SQLALCHEMY_DATABASE_URL": "", "INIT_NOT_EXISTED_DB": "True"}
+    )
 
     with TestClient(app):
         assert not metadata_mock.create_all.called

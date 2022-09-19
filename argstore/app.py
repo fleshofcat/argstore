@@ -24,7 +24,6 @@ def redirect_to_docs_from_root():
 @app.on_event("startup")
 def init_db_if_necessary():
     settings = Settings()
-    if settings.init_not_existed_db and not os.path.exists(
-        settings.sqlalchemy_database_url.replace("sqlite:///", "")
-    ):
+    db_path = settings.sqlalchemy_database_url.replace("sqlite:///", "")
+    if settings.init_not_existed_db and db_path and not os.path.exists(db_path):
         Base.metadata.create_all(bind=create_db_engine())
