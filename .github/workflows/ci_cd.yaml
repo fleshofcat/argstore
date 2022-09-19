@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   workflow_dispatch:
@@ -67,3 +67,21 @@ jobs:
           message: ${{ steps.coverage_comment.outputs.coverage }}
           color: ${{ steps.coverage_comment.outputs.color }}
           namedLogo: python
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ lint, test ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker images '${{ github.event.repository.name }}:${{ github.sha }}'
+        uses: docker/build-push-action@v2.7.0
+        with:
+          push: true
+          tags: ghcr.io/fleshofcat/${{ github.event.repository.name }}:${{ github.sha }}
