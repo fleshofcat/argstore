@@ -3,7 +3,20 @@
 [![Argstore](https://github.com/fleshofcat/argstore/actions/workflows/ci_cd.yaml/badge.svg)](https://github.com/fleshofcat/argstore/actions/workflows/ci_cd.yaml)
 ![Coverage badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/fleshofcat/d01bb46aff24caedfa24f12d77fd3f42/raw/argstore__master.json)
 
-This is a simple REST API for storing named strings as parameters.
+This is a simple REST API for storing named strings as user parameters.
+Users in this system are just entities in the database, without registration or anything else.
+
+The initial technical requirements for this project were the following API, which this service implements:
+
+![Required API](doc/required_api.png)
+
+A user API for testing the project has also been implemented:
+
+(There is no update user endpoint because there are no updateable fields in users in this version)
+
+![Users API](doc/users_api.png)
+
+---------
 
 This projects uses poetry as a package manager, so [install it.](https://python-poetry.org/docs/#installation)
 
