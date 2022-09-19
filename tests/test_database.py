@@ -7,23 +7,6 @@ from sqlalchemy.orm import Session
 from argstore import database, settings
 
 
-@pytest.fixture
-def db_is_not_initialized():
-    # noinspection PyProtectedMember
-    old_engine = database._engine
-
-    # noinspection PyProtectedMember
-    old_SessionFabric = database._SessionFabric
-
-    database._engine = None
-    database._SessionFabric = None
-
-    yield
-
-    database._engine = old_engine
-    database._SessionFabric = old_SessionFabric
-
-
 def test_get_db(mocker: MockerFixture, db_is_not_initialized):
     mocker.patch.object(
         database,
