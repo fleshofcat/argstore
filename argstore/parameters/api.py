@@ -52,6 +52,7 @@ def set_parameter(
 @router.get(
     "/{user_name}/{param_name}/",
     response_model=list[schemas.Parameter],
+    summary="Read Parameters Of All Types",
 )
 def read_parameter(
     response: Response,
@@ -71,7 +72,7 @@ def read_parameter(
 
 
 @router.delete("/{user_name}/{param_name}/{type_name}", status_code=204)
-def delete_param(
+def delete_parameter(
     user_name: str,
     param_name: str,
     type_name: SupportedType,
@@ -99,7 +100,11 @@ def read_all_user_parameters(username: str, db: Session = Depends(get_db)):
 json_api_router = APIRouter()
 
 
-@json_api_router.post("/{user_name}", response_model=schemas.JsonApiResult)
+@json_api_router.post(
+    "/{user_name}",
+    response_model=schemas.JsonApiResult,
+    summary='Set Parameter With "JSON-API"',
+)
 def set_parameter_with_json_api(
     user_name: str,
     query: schemas.JsonApiQuery,
