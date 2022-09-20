@@ -30,13 +30,54 @@ By default hostname 0.0.0.0 and port 8000 will be used, so open <http://localhos
 
 After some calls there the changes will be saved in the `db/argstore.db` file.
 
----------
+## Run from source
 
-This projects uses poetry as a package manager, so [install it.](https://python-poetry.org/docs/#installation)
+Global requirements:
 
-## For developers
+1. The project uses `python 3.10`.
+1. Also this projects uses poetry as a package manager, so [install it.](https://python-poetry.org/docs/#installation)
 
-After getting the source code install the pre-commit hooks for automate code checking.
+### Install
+
+``` bash
+git clone git@github.com:fleshofcat/argstore.git
+cd argstore
+poetry install
+```
+
+### Prepare DB
+
+1. Set `SQLALCHEMY_DATABASE_URL`
+
+    ``` bash
+    echo "SQLALCHEMY_DATABASE_URL=sqlite:///`pwd`/my_db.db" > .env
+    ```
+
+1. Init DB file
+
+    You can do it with alembic:
+
+    ``` bash
+    poetry run alembic upgrade head
+    ```
+
+    Or by setting env var `INIT_NOT_EXISTED_DB=True` before the run:
+
+    ``` bash
+    echo "INIT_NOT_EXISTED_DB=True" >> .env
+    ```
+
+### Run
+
+``` bash
+poetry run uvicorn argstore.app:app --host 0.0.0.0 --port 8000
+```
+
+That's it, now the application is running, you can open it: <http://localhost:8000/> and send requests.
+
+## PS for developers
+
+After getting the source code install the pre-commit hooks to automate code checking.
 
 ``` bash
 poetry run pre-commit install -t=pre-commit -t=pre-push
