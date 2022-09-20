@@ -16,16 +16,23 @@ A user API for testing the project has also been implemented:
 
 ![Users API](doc/users_api.png)
 
+## Usage
+
+To test the service you can run:
+
+``` bash
+mkdir db
+
+docker run -t -p 8000:8000 -e SQLALCHEMY_DATABASE_URL=sqlite:////app/db/argstore.db -e INIT_NOT_EXISTED_DB=True -v `readlink -f db`:/app/db ghcr.io/fleshofcat/argstore:latest
+```
+
+By default hostname 0.0.0.0 and port 8000 will be used, so open <http://localhost:8000/> end explore the doc there.
+
+After some calls there the changes will be saved in the `db/argstore.db` file.
+
 ---------
 
 This projects uses poetry as a package manager, so [install it.](https://python-poetry.org/docs/#installation)
-
-## Run with docker
-
-``` bash
-# Create db/argstore.db
-docker run -it -p 8000:8000 -e SQLALCHEMY_DATABASE_URL=sqlite:////app/db/argstore.db -v /path/to/your/db/:/app/db argstore:latest
-```
 
 ## For developers
 
