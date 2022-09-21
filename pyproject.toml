@@ -5,7 +5,7 @@ description = "Simple REST API for storing parameters"
 authors = ["fleshofcat <fleshofcat@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 fastapi = "^0.82.0"
 uvicorn = "^0.18.3"
 requests = "^2.28.1"
