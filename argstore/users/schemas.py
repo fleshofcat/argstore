@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, validator
 
 from ..parameters import schemas
@@ -18,7 +20,7 @@ class CreateUser(BaseModel):
 
 
 class User(CreateUser):
-    Parameters: list[schemas.Parameter]
+    Parameters: List[schemas.Parameter]
 
     class Config:
         orm_mode = True

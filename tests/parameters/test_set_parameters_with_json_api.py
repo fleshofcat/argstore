@@ -1,3 +1,5 @@
+from typing import Union
+
 import pytest
 from starlette.testclient import TestClient
 
@@ -142,7 +144,7 @@ def test_set_parameters_with_json_api_with_empty_query_list(
     ],
 )
 def test_set_parameters_with_json_api_with_invalid_payload(
-    client: TestClient, username: str, bad_payload: dict | list
+    client: TestClient, username: str, bad_payload: Union[dict, list]
 ):
     created_params_response = client.post(f"/api/{username}", json=bad_payload)
     assert created_params_response.status_code == 422, created_params_response.json()

@@ -1,6 +1,7 @@
 import typing
 from enum import Enum
 from pydoc import locate
+from typing import List
 
 from pydantic import BaseModel, StrictStr, validator
 
@@ -83,8 +84,8 @@ class JsonApiResultMessage(JsonApiMessage):
 
 
 class JsonApiQuery(BaseModel):
-    Query: list[JsonApiQueryMessage]
+    Query: List[JsonApiQueryMessage]
 
 
 class JsonApiResult(BaseModel):
-    Result: list[JsonApiResultMessage]
+    Result: List[JsonApiResultMessage]
