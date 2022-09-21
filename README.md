@@ -12,7 +12,7 @@ The initial task requirements for this project were the following API, which thi
 
 A user API for testing the project has also been implemented:
 
-(There is no update user endpoint because there are no updateable fields in users in this version.)
+(There is no update user endpoint because there are no updatable fields in users in this version.)
 
 ![Users API](doc/users_api.png)
 
