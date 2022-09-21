@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from sqlalchemy.orm import Session
 
 from argstore.users import models, schemas
@@ -11,11 +13,11 @@ def create_user(db: Session, user: schemas.CreateUser) -> models.User:
     return db_user
 
 
-def read_user(db: Session, username: str) -> models.User | None:
+def read_user(db: Session, username: str) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.Name == username).first()
 
 
-def read_users(db: Session, skip: int = 0, limit: int = 100) -> list[models.User]:
+def read_users(db: Session, skip: int = 0, limit: int = 100) -> List[models.User]:
     return db.query(models.User).offset(skip).limit(limit).all()
 
 

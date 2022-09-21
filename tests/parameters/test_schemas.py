@@ -52,4 +52,4 @@ def test_JsonApiQueryMessage_validation(bad_part: dict):
     }
 
     with pytest.raises(ValidationError):
-        JsonApiQueryMessage(**(valid_json | bad_part))
+        JsonApiQueryMessage(**{**valid_json, **bad_part})

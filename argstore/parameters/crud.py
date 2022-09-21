@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -5,7 +7,7 @@ from . import models, schemas
 
 def create_parameter(
     db: Session, param: schemas.CreateParameter
-) -> list[models.Parameter]:
+) -> List[models.Parameter]:
     db_param = models.Parameter(**param.dict())
     db.add(db_param)
     db.commit()
@@ -14,8 +16,8 @@ def create_parameter(
 
 
 def read_parameters(
-    db: Session, user_name: str, param_name: str, type_name: str | None = None
-) -> list[models.Parameter]:
+    db: Session, user_name: str, param_name: str, type_name: Optional[str] = None
+) -> List[models.Parameter]:
     query = (
         db.query(models.Parameter)
         .filter(models.Parameter.Name == param_name)
@@ -30,7 +32,7 @@ def read_parameters(
 
 def update_parameter(
     db: Session, param: schemas.CreateParameter
-) -> list[models.Parameter]:
+) -> List[models.Parameter]:
     if (
         db.query(models.Parameter)
         .filter(models.Parameter.Name == param.Name)
@@ -65,7 +67,7 @@ def delete_parameter(
 def read_all_user_parameters(
     db: Session,
     username: str,
-) -> list[models.Parameter]:
+) -> List[models.Parameter]:
     return (
         db.query(models.Parameter).filter(models.Parameter.Username == username).all()
     )

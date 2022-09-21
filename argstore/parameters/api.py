@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
@@ -12,7 +14,7 @@ router = APIRouter()
 
 @router.post(
     "/{user_name}/{param_name}/{type_name}",
-    response_model=list[schemas.Parameter],
+    response_model=List[schemas.Parameter],
 )
 def set_parameter(
     user_name: str,
@@ -47,18 +49,18 @@ def set_parameter(
 
 @router.get(
     "/{user_name}/{param_name}/{type_name}",
-    response_model=list[schemas.Parameter],
+    response_model=List[schemas.Parameter],
 )
 @router.get(
     "/{user_name}/{param_name}/",
-    response_model=list[schemas.Parameter],
+    response_model=List[schemas.Parameter],
     summary="Read Parameters Of All Types",
 )
 def read_parameter(
     response: Response,
     user_name: str,
     param_name: str,
-    type_name: SupportedType | None = None,
+    type_name: Optional[SupportedType] = None,
     db: Session = Depends(get_db),
 ):
     if read_user(db, user_name):
@@ -89,7 +91,7 @@ def delete_parameter(
         )
 
 
-@router.get("/{username}", response_model=list[schemas.Parameter])
+@router.get("/{username}", response_model=List[schemas.Parameter])
 def read_all_user_parameters(username: str, db: Session = Depends(get_db)):
     if read_user(db, username):
         return crud.read_all_user_parameters(db, username)

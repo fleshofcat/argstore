@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -12,7 +14,7 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
 
 
-@router.get("/", response_model=list[schemas.User])
+@router.get("/", response_model=List[schemas.User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.read_users(db, skip, limit)
 
