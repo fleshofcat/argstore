@@ -36,7 +36,7 @@ After some calls the changes will be saved in the `db/argstore.db` file.
 
 Global requirements:
 
-1. The project uses `python 3.10`.
+1. `python 3.8` or newer.
 1. Also this projects uses poetry as a package manager, so [install it.](https://python-poetry.org/docs/#installation)
 
 ### Install
