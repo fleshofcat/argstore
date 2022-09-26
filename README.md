@@ -30,7 +30,7 @@ docker run -t -p 8000:8000 -e SQLALCHEMY_DATABASE_URL=sqlite:////app/db/argstore
 
 By default `hostname 0.0.0.0` and `port 8000` will be used, so open <http://localhost:8000/> end explore the doc there.
 
-After some calls the changes will be saved in the `db/argstore.db` file.
+After some API calls the changes will be saved in the `db/argstore.db` file.
 
 ## Run from source
 
