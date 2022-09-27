@@ -48,6 +48,9 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Test with pytest
         run: |
           set -o pipefail  # To avoid the tee to rewrite the pytest exit code
