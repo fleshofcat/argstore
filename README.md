@@ -2,6 +2,7 @@
 
 [![Argstore](https://github.com/fleshofcat/argstore/actions/workflows/ci_cd.yaml/badge.svg)](https://github.com/fleshofcat/argstore/actions/workflows/ci_cd.yaml)
 ![Coverage badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/fleshofcat/d01bb46aff24caedfa24f12d77fd3f42/raw/argstore__master.json)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 This is a simple REST API for storing named strings as user parameters.
 Users in this system are just entities in the database, without registration or anything else.
