@@ -20,6 +20,7 @@ pytest-cov = "^3.0.0"
 pytest-mock = "^3.8.2"
 alembic = "^1.8.1"
 init = "^0.1.0"
+requests-toolbelt = "^0.9.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

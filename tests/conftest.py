@@ -1,6 +1,8 @@
 import os
 
 import pytest
+from pydantic import BaseSettings
+from requests_toolbelt import sessions
 from starlette.testclient import TestClient
 
 from argstore import database
@@ -15,6 +17,18 @@ def pytest_make_parametrize_id(config, val):
         return repr(val.__name__)
 
     return repr(val)
+
+
+class SettingsForTest(BaseSettings):
+    url_to_test: str = ""
+
+    class Config:
+        env_file = ".env", "../.env"
+
+
+@pytest.fixture(scope="session")
+def settings_for_test() -> SettingsForTest:
+    return SettingsForTest()
 
 
 @pytest.fixture(scope="session")
@@ -33,10 +47,14 @@ def client_without_db() -> TestClient:
     return TestClient(app)
 
 
-@pytest.fixture(scope="session")
-def client(client_without_db, use_test_db) -> TestClient:
-    now_it_is_a_client_with_db = client_without_db
-    return now_it_is_a_client_with_db
+@pytest.fixture(scope="session")  # TODO Change TestClient to Session in type hints
+def client(client_without_db, use_test_db, settings_for_test) -> TestClient:
+    if settings_for_test.url_to_test:
+        with sessions.BaseUrlSession(base_url=settings_for_test.url_to_test) as s:
+            yield s
+    else:
+        now_it_is_a_client_with_db = client_without_db
+        yield now_it_is_a_client_with_db
 
 
 @pytest.fixture
