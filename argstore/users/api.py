@@ -11,7 +11,12 @@ router = APIRouter()
 
 @router.post("/", response_model=schemas.User, status_code=201)
 def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
-    return crud.create_user(db, user)
+    if not crud.read_user(db, user.Name):
+        return crud.create_user(db, user)
+    else:
+        raise HTTPException(
+            status_code=409, detail=f"User: '{user.Name}' already exists"
+        )
 
 
 @router.get("/", response_model=List[schemas.User])

@@ -8,6 +8,13 @@ def test_create_read_user(client: TestClient):
     assert client.get("/users_api/users/Bob").json() == bob_response.json()
 
 
+def test_recreate_existing_user(client: TestClient):
+    new_user = client.post("/users_api/users/", json={"Name": "user_to_re_create"})
+    assert new_user.status_code in (201, 409), new_user.json()
+    recreated = client.post("/users_api/users/", json={"Name": "user_to_re_create"})
+    assert recreated.status_code == 409, recreated.json()
+
+
 def test_read_not_existing_user(client: TestClient):
     assert client.get("/users_api/users/not_existing_user").status_code == 404
 
