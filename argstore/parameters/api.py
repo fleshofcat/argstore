@@ -57,7 +57,6 @@ def set_parameter(
     summary="Read Parameters Of All Types",
 )
 def read_parameter(
-    response: Response,
     user_name: str,
     param_name: str,
     type_name: Optional[SupportedType] = None,
@@ -67,7 +66,6 @@ def read_parameter(
         if params := crud.read_parameters(db, user_name, param_name, type_name):
             return params
         else:
-            response.status_code = status.HTTP_204_NO_CONTENT
             return []
     else:
         raise HTTPException(status_code=404, detail=f"User: '{user_name}' not found")

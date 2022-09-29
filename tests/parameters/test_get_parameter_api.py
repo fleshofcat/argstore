@@ -53,8 +53,7 @@ def test_get_not_existing_parameter(client: TestClient, typename, username):
         f"/api/parameters/{username}/not_exiting_parameter/{typename}"
     )
 
-    assert not_existing_parameter_response.status_code == 204
-    assert not_existing_parameter_response.reason == "No Content"
+    assert not_existing_parameter_response.status_code == 200
     assert not_existing_parameter_response.json() == []
 
 
