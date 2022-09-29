@@ -1,4 +1,5 @@
 import pytest
+from requests import Session
 from starlette.testclient import TestClient
 
 
@@ -24,7 +25,7 @@ def test_get_parameter_with_invalid_type(client: TestClient, username, bad_type)
     assert "detail" in get_param_response.json()
 
 
-def test_get_parameter_without_type(client: TestClient, username):
+def test_get_parameter_without_type(client: Session, username):
     param = "param_to_test_get_without_type"
     h = {"Content-type": "text/plain"}
     client.post(f"/api/parameters/{username}/{param}/str", data="val", headers=h)

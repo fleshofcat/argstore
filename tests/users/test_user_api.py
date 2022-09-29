@@ -1,9 +1,15 @@
+import pytest
 from starlette.testclient import TestClient
 
 
-def test_create_read_user(client: TestClient):
+@pytest.fixture
+def ensure_user_bob_doesnt_exist(client: TestClient):
+    assert client.delete("/users_api/users/Bob").status_code in (204, 404)
+
+
+def test_create_read_user(client: TestClient, ensure_user_bob_doesnt_exist):
     bob_response = client.post("/users_api/users/", json={"Name": "Bob"})
-    assert bob_response.status_code == 201, bob_response.reason
+    assert bob_response.status_code == 201
     assert bob_response.json() == {"Name": "Bob", "Parameters": []}
     assert client.get("/users_api/users/Bob").json() == bob_response.json()
 
