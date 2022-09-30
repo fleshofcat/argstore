@@ -47,8 +47,8 @@ def client_without_db() -> TestClient:
     return TestClient(app)
 
 
-@pytest.fixture(scope="session")  # TODO Change TestClient to Session in type hints
-def client(client_without_db, use_test_db, settings_for_test) -> TestClient:
+@pytest.fixture(scope="session")
+def client(client_without_db, use_test_db, settings_for_test):
     if settings_for_test.url_to_test:
         with sessions.BaseUrlSession(base_url=settings_for_test.url_to_test) as s:
             yield s
