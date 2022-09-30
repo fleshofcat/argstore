@@ -1,8 +1,8 @@
 from pydantic import BaseModel
-from starlette.testclient import TestClient
+from requests import Session
 
 
-def test_get_all_user_parameters(client: TestClient, username: str):
+def test_get_all_user_parameters(client: Session, username: str):
     h = {"Content-type": "text/plain"}
 
     class ParamToCreate(BaseModel):
@@ -30,7 +30,7 @@ def test_get_all_user_parameters(client: TestClient, username: str):
         assert param.dict() in all_user_params
 
 
-def test_get_all_parameters_of_user_without_parameters(client: TestClient):
+def test_get_all_parameters_of_user_without_parameters(client: Session):
     client.post("/users_api/users/", json={"Name": "user_without_params"})
 
     params_of_new_user_response = client.get("/api/parameters/user_without_params")
@@ -38,7 +38,7 @@ def test_get_all_parameters_of_user_without_parameters(client: TestClient):
     assert params_of_new_user_response.json() == []
 
 
-def test_get_all_parameters_of_not_existing_user(client: TestClient):
+def test_get_all_parameters_of_not_existing_user(client: Session):
     params_not_existing_user_response = client.get("/api/parameters/not_existing_user")
     assert params_not_existing_user_response.status_code == 404
     assert "detail" in params_not_existing_user_response.json()

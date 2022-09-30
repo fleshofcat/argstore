@@ -11,12 +11,8 @@ on:
 
 jobs:
   test:
-    name: Test run argstore:latest from ghcr on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
+    name: Test argstore image
+    runs-on: ubuntu-latest
 
     steps:
       # Prepare tests and their requirements
@@ -35,8 +31,8 @@ jobs:
       - if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install
 
-      # Run argstore from registry
-      - run: |
+      - name: Run argstore container
+        run: |
           mkdir db_folder
           docker run -d -p 8000:8000 -e SQLALCHEMY_DATABASE_URL=sqlite:////app/db/argstore.db -e INIT_NOT_EXISTED_DB=True -v `readlink -f db_folder`:/app/db ghcr.io/fleshofcat/argstore:latest
       - name: Wait the argstore container to start

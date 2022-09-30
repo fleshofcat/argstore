@@ -1,13 +1,14 @@
 import os
 
 from pytest_mock import MockFixture
+from requests import Session
 from starlette.testclient import TestClient
 
 from argstore.app import app
 from argstore.database import Base
 
 
-def test_redirect_to_docs_from_root(client_without_db: TestClient):
+def test_redirect_to_docs_from_root(client_without_db: Session):
     response = client_without_db.get("/")
     assert response.status_code == 200
     assert response.url.endswith("/docs")

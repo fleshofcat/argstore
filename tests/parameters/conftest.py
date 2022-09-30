@@ -1,9 +1,9 @@
 import pytest
-from starlette.testclient import TestClient
+from requests import Session
 
 
 @pytest.fixture(scope="session")
-def username(client: TestClient):
+def username(client: Session):
     user = "test_parameters_api_username"
     try:
         return client.get(f"/users_api/users/{user}").json()["Name"]
@@ -12,7 +12,7 @@ def username(client: TestClient):
 
 
 @pytest.fixture(params=[("str", "old_val"), ("int", "0")])
-def param_existing_for_user(client: TestClient, username: str, request):
+def param_existing_for_user(client: Session, username: str, request):
     typename, old_value = request.param
     client.post(
         f"/api/parameters/{username}/param_name/{typename}",
