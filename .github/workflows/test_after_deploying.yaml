@@ -2,12 +2,8 @@ name: Test after deploying
 
 on:
   workflow_dispatch:
-
-  push:
-    branches: [master]
-
-  pull_request:
-    branches: [master]
+  registry_package:
+    types: [published]
 
 jobs:
   test:
