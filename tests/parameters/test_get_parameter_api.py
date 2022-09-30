@@ -1,8 +1,8 @@
 import pytest
-from starlette.testclient import TestClient
+from requests import Session
 
 
-def test_get_parameter(client: TestClient, param_existing_for_user):
+def test_get_parameter(client: Session, param_existing_for_user):
     param_name, user, typename, value = param_existing_for_user
 
     get_param_response = client.get(f"/api/parameters/{user}/{param_name}/{typename}")
@@ -18,13 +18,13 @@ def test_get_parameter(client: TestClient, param_existing_for_user):
 
 
 @pytest.mark.parametrize("bad_type", [" ", "type", "float"])
-def test_get_parameter_with_invalid_type(client: TestClient, username, bad_type):
+def test_get_parameter_with_invalid_type(client: Session, username, bad_type):
     get_param_response = client.get(f"/api/parameters/{username}/param_name/{bad_type}")
     assert get_param_response.status_code == 422
     assert "detail" in get_param_response.json()
 
 
-def test_get_parameter_without_type(client: TestClient, username):
+def test_get_parameter_without_type(client: Session, username):
     param = "param_to_test_get_without_type"
     h = {"Content-type": "text/plain"}
     client.post(f"/api/parameters/{username}/{param}/str", data="val", headers=h)
@@ -48,7 +48,7 @@ def test_get_parameter_without_type(client: TestClient, username):
 
 
 @pytest.mark.parametrize("typename", ["int", "str"])
-def test_get_not_existing_parameter(client: TestClient, typename, username):
+def test_get_not_existing_parameter(client: Session, typename, username):
     not_existing_parameter_response = client.get(
         f"/api/parameters/{username}/not_exiting_parameter/{typename}"
     )
@@ -57,7 +57,7 @@ def test_get_not_existing_parameter(client: TestClient, typename, username):
     assert not_existing_parameter_response.json() == []
 
 
-def test_get_parameter_with_invalid_user(client: TestClient):
+def test_get_parameter_with_invalid_user(client: Session):
     param_with_invalid_user_response = client.get(
         "/api/parameters/not_existing_user/param_name/str"
     )

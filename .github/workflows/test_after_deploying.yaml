@@ -1,0 +1,46 @@
+name: Test after deploying
+
+on:
+  workflow_dispatch:
+  registry_package:
+    types: [published]
+
+jobs:
+  test:
+    name: Test argstore image
+    runs-on: ubuntu-latest
+
+    steps:
+      # Prepare tests and their requirements
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - uses: abatilo/actions-poetry@v2.1.0
+        with:
+          poetry-version: 1.1.14
+      - id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/
+          key: ${{ runner.os }}-pyproject-toml-${{ hashFiles('pyproject.toml') }}-poetry-lock-${{ hashFiles('poetry.lock') }}
+      - if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install
+
+      - name: Run argstore container
+        run: |
+          mkdir db_folder
+          docker run -d -p 8000:8000 -e SQLALCHEMY_DATABASE_URL=sqlite:////app/db/argstore.db -e INIT_NOT_EXISTED_DB=True -v `readlink -f db_folder`:/app/db ghcr.io/fleshofcat/argstore:latest
+      - name: Wait the argstore container to start
+        run: wget -qO- https://raw.githubusercontent.com/eficode/wait-for/$WAIT_FOR_VERSION/wait-for | sh -s -- http://localhost:8000/docs -- echo "argstore is up"
+        env:
+          WAIT_FOR_VERSION: 4df3f9262d84cab0039c07bf861045fbb3c20ab7 # v2.2.3
+
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - name: Run tests against a real server
+        run: |
+          poetry run pytest tests
+        env:
+          URL_TO_TEST: http://localhost:8000

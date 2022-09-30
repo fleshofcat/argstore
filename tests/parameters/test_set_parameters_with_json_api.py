@@ -1,10 +1,10 @@
 from typing import Union
 
 import pytest
-from starlette.testclient import TestClient
+from requests import Session
 
 
-def test_set_parameters_with_json_api(client: TestClient, username: str):
+def test_set_parameters_with_json_api(client: Session, username: str):
     created_params = client.post(
         f"/api/{username}",
         json={
@@ -63,7 +63,7 @@ def test_set_parameters_with_json_api(client: TestClient, username: str):
 
 
 def test_set_parameters_with_json_api_with_operations_on_the_same_parameter(
-    client: TestClient, username: str
+    client: Session, username: str
 ):
     created_params = client.post(
         f"/api/{username}",
@@ -113,7 +113,7 @@ def test_set_parameters_with_json_api_with_operations_on_the_same_parameter(
 
 
 def test_set_parameters_with_json_api_with_empty_query_list(
-    client: TestClient, username: str
+    client: Session, username: str
 ):
     created_params = client.post(f"/api/{username}", json={"Query": []})
     assert created_params.status_code == 200, created_params.json()
@@ -144,14 +144,14 @@ def test_set_parameters_with_json_api_with_empty_query_list(
     ],
 )
 def test_set_parameters_with_json_api_with_invalid_payload(
-    client: TestClient, username: str, bad_payload: Union[dict, list]
+    client: Session, username: str, bad_payload: Union[dict, list]
 ):
     created_params_response = client.post(f"/api/{username}", json=bad_payload)
     assert created_params_response.status_code == 422, created_params_response.json()
     assert "detail" in created_params_response.json()
 
 
-def test_set_parameters_with_json_api_with_invalid_user(client: TestClient):
+def test_set_parameters_with_json_api_with_invalid_user(client: Session):
     created_params = client.post(
         "/api/not_existed_user",
         json={
