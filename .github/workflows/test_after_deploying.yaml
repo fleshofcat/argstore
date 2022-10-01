@@ -3,7 +3,6 @@ name: Test after deploying
 on:
   workflow_dispatch:
   registry_package:
-    types: [published]
 
 jobs:
   test:
