@@ -92,5 +92,4 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/fleshofcat/${{ github.event.repository.name }}:${{ github.sha }}
             ghcr.io/fleshofcat/${{ github.event.repository.name }}:latest
